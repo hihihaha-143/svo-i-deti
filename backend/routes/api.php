@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ChatTemplateCategoryController;
 use App\Http\Controllers\Api\ChatTemplateController;
 use App\Http\Controllers\Api\PsychologistDashboardController;
+use App\Http\Controllers\Api\PsychologistDailyTipController;
 use App\Http\Controllers\Api\PsychologistDiaryController;
 use App\Http\Controllers\Api\PsychologistEventController;
 use App\Http\Controllers\Api\PsychologistLoginLogController;
@@ -61,4 +62,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/psychologist/parent-materials/{material}', [PsychologistParentMaterialController::class, 'update']);
     Route::delete('/psychologist/parent-materials/{material}', [PsychologistParentMaterialController::class, 'destroy']);
     Route::post('/psychologist/parent-materials/{material}/toggle-publish', [PsychologistParentMaterialController::class, 'togglePublish']);
+
+    // Ежедневные советы
+    Route::get('/psychologist/daily-tips', [PsychologistDailyTipController::class, 'index']);
+    Route::post('/psychologist/daily-tips', [PsychologistDailyTipController::class, 'store']);
+    Route::put('/psychologist/daily-tips/{tip}', [PsychologistDailyTipController::class, 'update']);
+    Route::delete('/psychologist/daily-tips/{tip}', [PsychologistDailyTipController::class, 'destroy']);
 });
