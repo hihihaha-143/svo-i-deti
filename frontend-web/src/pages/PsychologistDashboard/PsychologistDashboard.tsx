@@ -12,6 +12,8 @@ import DiaryPage from '../DiaryPage/DiaryPage';
 import EventPage from '../EventPage/EventPage';
 import EventAttendancePage from '../EventPage/EventAttendancePage';
 import ChatTemplatesPage from '../ChatTemplatesPage/ChatTemplatesPage';
+import ParentMaterialsPage from '../ParentMaterialsPage/ParentMaterialsPage';
+import DailyTipsPage from '../DailyTipsPage/DailyTipsPage';
 import { useAuth } from '../../contexts/AuthContext';
 import apiClient from '../../api/client';
 
@@ -27,11 +29,11 @@ interface DashboardData {
     online_mentors: number;
 }
 
-type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries' | 'events' | 'event-attendance' | 'chat-templates';
+type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries' | 'events' | 'event-attendance' | 'chat-templates' | 'parent-materials' | 'daily-tips';
 
 const STORAGE_KEY = 'psychologist_current_page';
 const VALID_PAGES: PageKey[] = [
-    'dashboard', 'users', 'login-logs', 'moods', 'diaries', 'events', 'event-attendance', 'chat-templates',
+    'dashboard', 'users', 'login-logs', 'moods', 'diaries', 'events', 'event-attendance', 'chat-templates', 'parent-materials', 'daily-tips',
 ];
 
 function isValidPage(value: string | null): value is PageKey {
@@ -136,6 +138,8 @@ export default function PsychologistDashboard() {
         events: 'Мероприятия',
         'event-attendance': 'Посещаемость мероприятия',
         'chat-templates': 'Чат-шаблоны для быстрых ответов',
+        'parent-materials': 'Управление материалами',
+        'daily-tips': 'Управление ежедневными советами',
     };
 
     const renderPage = () => {
@@ -194,6 +198,14 @@ export default function PsychologistDashboard() {
 
         if (currentPage === 'chat-templates') {
             return <ChatTemplatesPage />;
+        }
+
+        if (currentPage === 'parent-materials') {
+            return <ParentMaterialsPage />;
+        }
+
+        if (currentPage === 'daily-tips') {
+            return <DailyTipsPage />;
         }
 
         return null;

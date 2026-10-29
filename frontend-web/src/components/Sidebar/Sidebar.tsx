@@ -6,7 +6,7 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
-type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries' | 'events' | 'event-attendance' | 'chat-templates';
+type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries' | 'events' | 'event-attendance' | 'chat-templates' | 'parent-materials' | 'daily-tips';
 
 interface SidebarProps {
     onClose?: () => void;
@@ -114,10 +114,18 @@ export default function Sidebar({ onClose, onNavigate, currentPage }: SidebarPro
 
                 <div className="sidebar__group">
                     <span className="sidebar__group-title">Контент</span>
-                    <a href="#" className="sidebar__link">
+                    <a
+                        href="#"
+                        className={`sidebar__link ${currentPage === 'parent-materials' ? 'sidebar__link--active' : ''}`}
+                        onClick={(e) => { e.preventDefault(); onNavigate?.('parent-materials'); onClose?.(); }}
+                    >
                         <FolderOpen size={20} /> Материалы для родителей
                     </a>
-                    <a href="#" className="sidebar__link">
+                    <a
+                        href="#"
+                        className={`sidebar__link ${currentPage === 'daily-tips' ? 'sidebar__link--active' : ''}`}
+                        onClick={(e) => { e.preventDefault(); onNavigate?.('daily-tips'); onClose?.(); }}
+                    >
                         <Lightbulb size={20} /> Ежедневные советы
                     </a>
                     <a href="#" className="sidebar__link">
