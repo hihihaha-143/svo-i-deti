@@ -1,0 +1,114 @@
+import {
+    LayoutDashboard, Users, DoorOpen, FileText, Smile, BookOpen, 
+    MessageSquareReply, CalendarDays, Clock, MessageCircle, 
+    MessageSquareDashed, FolderOpen, Lightbulb, FileHeart, Puzzle, ListChecks, LogOut, X
+} from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+
+interface SidebarProps {
+    onClose?: () => void;
+}
+
+export default function Sidebar({ onClose }: SidebarProps) {
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
+
+    return (
+        <aside className={`sidebar ${onClose ? 'sidebar--mobile' : ''}`}>
+            <div className="sidebar__header">
+                <h2 className="sidebar__title">Ваш личный кабинет</h2>
+                {onClose && (
+                    <button className="sidebar__close" onClick={onClose}>
+                        <X size={24} />
+                    </button>
+                )}
+            </div>
+
+            <nav className="sidebar__nav">
+                <div className="sidebar__group">
+                    <span className="sidebar__group-title">Основное</span>
+                    <a href="#" className="sidebar__link sidebar__link--active">
+                        <LayoutDashboard size={20} /> Главная
+                    </a>
+                    <a href="#" className="sidebar__link">
+                        <Users size={20} /> Пользователи
+                    </a>
+                    <a href="#" className="sidebar__link">
+                        <DoorOpen size={20} /> Мониторинг входов
+                    </a>
+                    <a href="#" className="sidebar__link">
+                        <FileText size={20} /> Отчётность
+                    </a>
+                </div>
+
+                <div className="sidebar__group">
+                    <span className="sidebar__group-title">Дети</span>
+                    <a href="#" className="sidebar__link">
+                        <Smile size={20} /> Настроения детей
+                    </a>
+                    <a href="#" className="sidebar__link">
+                        <BookOpen size={20} /> Дневники родителей
+                    </a>
+                    <a href="#" className="sidebar__link">
+                        <MessageSquareReply size={20} /> Ответы детей
+                    </a>
+                    <a href="#" className="sidebar__link">
+                        <CalendarDays size={20} /> Мероприятия
+                    </a>
+                </div>
+
+                <div className="sidebar__group">
+                    <span className="sidebar__group-title">Уведомления</span>
+                    <a href="#" className="sidebar__link">
+                        <Clock size={20} /> По расписанию
+                    </a>
+                </div>
+
+                <div className="sidebar__group">
+                    <span className="sidebar__group-title">Коммуникация</span>
+                    <a href="#" className="sidebar__link">
+                        <MessageCircle size={20} /> Чат
+                    </a>
+                    <a href="#" className="sidebar__link">
+                        <MessageSquareDashed size={20} /> Чат-шаблоны
+                    </a>
+                </div>
+
+                <div className="sidebar__group">
+                    <span className="sidebar__group-title">Контент</span>
+                    <a href="#" className="sidebar__link">
+                        <FolderOpen size={20} /> Материалы для родителей
+                    </a>
+                    <a href="#" className="sidebar__link">
+                        <Lightbulb size={20} /> Ежедневные советы
+                    </a>
+                    <a href="#" className="sidebar__link">
+                        <FileHeart size={20} /> Рекомендации родителям
+                    </a>
+                </div>
+
+                <div className="sidebar__group">
+                    <span className="sidebar__group-title">Тесты</span>
+                    <a href="#" className="sidebar__link">
+                        <Puzzle size={20} /> Список тестов
+                    </a>
+                    <a href="#" className="sidebar__link">
+                        <ListChecks size={20} /> Результаты тестов
+                    </a>
+                </div>
+            </nav>
+
+            <div className="sidebar__footer">
+                <button onClick={handleLogout} className="sidebar__link sidebar__link--logout">
+                    <LogOut size={20} /> Выйти
+                </button>
+            </div>
+        </aside>
+    );
+}

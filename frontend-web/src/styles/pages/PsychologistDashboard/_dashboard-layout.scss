@@ -1,0 +1,94 @@
+.dashboard-layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--bg-admin);
+    color: var(--text-admin);
+    position: relative;
+
+    &__sidebar-wrapper {
+        display: flex;
+        
+        @media (max-width: 1024px) {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 1000;
+            width: 0; /* Скрываем в потоке */
+            
+            /* Когда обертка активна, показываем */
+            &--open {
+                width: auto;
+            }
+        }
+    }
+
+    &__overlay {
+        display: none;
+        @media (max-width: 1024px) {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+    }
+}
+
+.dashboard-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow-y: auto;
+    width: 100%;
+
+    &__header {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        padding: 2rem 4rem;
+        background-color: #ffffff;
+        border-bottom: 1px solid #e0e0e0;
+
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            margin-right: auto;
+        }
+
+        @media (max-width: 768px) {
+            padding: 1.5rem 2rem;
+            h1 { font-size: 1.8rem; }
+        }
+    }
+
+    &__burger {
+        display: none;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-admin);
+
+        @media (max-width: 1024px) {
+            display: block;
+        }
+    }
+
+    &__user {
+        font-weight: 600;
+        font-size: 1.6rem;
+    }
+
+    &__body {
+        padding: 4rem;
+        flex-grow: 1;
+
+        @media (max-width: 768px) {
+            padding: 2rem;
+        }
+    }
+}

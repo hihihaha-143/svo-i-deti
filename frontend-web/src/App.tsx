@@ -2,16 +2,16 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LoginPage from './pages/LoginPage/LoginPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import PsychologistDashboard from './pages/PsychologistDashboard/PsychologistDashboard'; // <-- импорт
 
+// Временная заглушка для остальных ролей
 function RoleStub({ title }: { title: string }) {
-    const { user, profile } = useAuth();
+    const { user } = useAuth();
     if (!user) return null;
     return (
         <div style={{ padding: '20px' }}>
             <h1>{title}</h1>
             <p>Привет, <strong>{user.name}</strong>!</p>
-            <p>Твоя роль: <strong>{user.role}</strong></p>
-            <p>Твой ID: <strong>{profile?.external_id}</strong></p>
         </div>
     );
 }
@@ -24,10 +24,10 @@ function App() {
                     <Route path="/" element={<Navigate to="/login" replace />} />
                     <Route path="/login" element={<LoginPage />} />
                     
-                    {/* Защищенные маршруты */}
                     <Route element={<ProtectedRoute allowedRole="psychologist" />}>
-                        <Route path="/psychologist" element={<RoleStub title="Дашборд Психолога" />} />
+                        <Route path="/psychologist" element={<PsychologistDashboard />} />
                     </Route>
+                    
                     <Route element={<ProtectedRoute allowedRole="mentor" />}>
                         <Route path="/mentor" element={<RoleStub title="Дашборд Наставника" />} />
                     </Route>
