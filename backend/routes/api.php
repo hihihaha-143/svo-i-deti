@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PsychologistDashboardController;
+use App\Http\Controllers\Api\PsychologistDiaryController;
 use App\Http\Controllers\Api\PsychologistLoginLogController;
 use App\Http\Controllers\Api\PsychologistMoodController;
 use App\Http\Controllers\Api\PsychologistUserController;
@@ -27,4 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/psychologist/moods', [PsychologistMoodController::class, 'index']);
     Route::get('/psychologist/moods/export', [PsychologistMoodController::class, 'export']);
+
+    Route::get('/psychologist/diaries', [PsychologistDiaryController::class, 'index']);
+    Route::get('/psychologist/diaries/export', [PsychologistDiaryController::class, 'export']);
 });

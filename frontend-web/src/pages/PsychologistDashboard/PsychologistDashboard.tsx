@@ -8,6 +8,7 @@ import OnlineCardsBlock from './OnlineCardsBlock';
 import UsersPage from './UsersPage';
 import LoginLogsPage from '../LoginLogsPage/LoginLogsPage';
 import MoodPage from '../MoodPage/MoodPage';
+import DiaryPage from '../DiaryPage/DiaryPage';
 import { useAuth } from '../../contexts/AuthContext';
 import apiClient from '../../api/client';
 
@@ -23,10 +24,10 @@ interface DashboardData {
     online_mentors: number;
 }
 
-type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods';
+type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries';
 
 const STORAGE_KEY = 'psychologist_current_page';
-const VALID_PAGES: PageKey[] = ['dashboard', 'users', 'login-logs', 'moods'];
+const VALID_PAGES: PageKey[] = ['dashboard', 'users', 'login-logs', 'moods', 'diaries'];
 
 function isValidPage(value: string | null): value is PageKey {
     return value !== null && (VALID_PAGES as string[]).includes(value);
@@ -89,6 +90,7 @@ export default function PsychologistDashboard() {
         users: 'Пользователи',
         'login-logs': 'Мониторинг входов',
         moods: 'Настроения детей',
+        diaries: 'Дневники родителей',
     };
 
     const renderPage = () => {
@@ -124,7 +126,11 @@ export default function PsychologistDashboard() {
             return <LoginLogsPage />;
         }
 
-        return <MoodPage />;
+        if (currentPage === 'moods') {
+            return <MoodPage />;
+        }
+
+        return <DiaryPage />;
     };
 
     return (
