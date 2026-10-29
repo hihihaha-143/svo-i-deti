@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ChatTemplateCategoryController;
+use App\Http\Controllers\Api\ChatTemplateController;
 use App\Http\Controllers\Api\PsychologistDashboardController;
 use App\Http\Controllers\Api\PsychologistDiaryController;
 use App\Http\Controllers\Api\PsychologistEventController;
@@ -40,4 +42,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/psychologist/events/{id}/attendance', [PsychologistEventController::class, 'attendance']);
     Route::post('/psychologist/events/{id}/attendance', [PsychologistEventController::class, 'saveAttendance']);
-});
+
+    // Чат-шаблоны
+    Route::get('/psychologist/chat-template-categories', [ChatTemplateCategoryController::class, 'index']);
+    Route::post('/psychologist/chat-template-categories', [ChatTemplateCategoryController::class, 'store']);
+    Route::put('/psychologist/chat-template-categories/{category}', [ChatTemplateCategoryController::class, 'update']);
+    Route::delete('/psychologist/chat-template-categories/{category}', [ChatTemplateCategoryController::class, 'destroy']);
+
+    Route::get('/psychologist/chat-templates', [ChatTemplateController::class, 'index']);
+    Route::post('/psychologist/chat-templates', [ChatTemplateController::class, 'store']);
+    Route::put('/psychologist/chat-templates/{chatTemplate}', [ChatTemplateController::class, 'update']);
+    Route::delete('/psychologist/chat-templates/{chatTemplate}', [ChatTemplateController::class, 'destroy']);
+});  

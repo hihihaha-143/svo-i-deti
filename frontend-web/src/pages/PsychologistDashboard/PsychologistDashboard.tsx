@@ -11,6 +11,7 @@ import MoodPage from '../MoodPage/MoodPage';
 import DiaryPage from '../DiaryPage/DiaryPage';
 import EventPage from '../EventPage/EventPage';
 import EventAttendancePage from '../EventPage/EventAttendancePage';
+import ChatTemplatesPage from '../ChatTemplatesPage/ChatTemplatesPage';
 import { useAuth } from '../../contexts/AuthContext';
 import apiClient from '../../api/client';
 
@@ -26,11 +27,11 @@ interface DashboardData {
     online_mentors: number;
 }
 
-type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries' | 'events' | 'event-attendance';
+type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries' | 'events' | 'event-attendance' | 'chat-templates';
 
 const STORAGE_KEY = 'psychologist_current_page';
 const VALID_PAGES: PageKey[] = [
-    'dashboard', 'users', 'login-logs', 'moods', 'diaries', 'events', 'event-attendance',
+    'dashboard', 'users', 'login-logs', 'moods', 'diaries', 'events', 'event-attendance', 'chat-templates',
 ];
 
 function isValidPage(value: string | null): value is PageKey {
@@ -134,6 +135,7 @@ export default function PsychologistDashboard() {
         diaries: 'Дневники родителей',
         events: 'Мероприятия',
         'event-attendance': 'Посещаемость мероприятия',
+        'chat-templates': 'Чат-шаблоны для быстрых ответов',
     };
 
     const renderPage = () => {
@@ -188,6 +190,10 @@ export default function PsychologistDashboard() {
                     onBack={handleBackFromAttendance}
                 />
             );
+        }
+
+        if (currentPage === 'chat-templates') {
+            return <ChatTemplatesPage />;
         }
 
         return null;

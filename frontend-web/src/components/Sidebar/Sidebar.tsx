@@ -6,7 +6,7 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
-type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries' | 'events' | 'event-attendance';
+type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries' | 'events' | 'event-attendance' | 'chat-templates';
 
 interface SidebarProps {
     onClose?: () => void;
@@ -103,7 +103,11 @@ export default function Sidebar({ onClose, onNavigate, currentPage }: SidebarPro
                     <a href="#" className="sidebar__link">
                         <MessageCircle size={20} /> Чат
                     </a>
-                    <a href="#" className="sidebar__link">
+                    <a
+                        href="#"
+                        className={`sidebar__link ${currentPage === 'chat-templates' ? 'sidebar__link--active' : ''}`}
+                        onClick={(e) => { e.preventDefault(); onNavigate?.('chat-templates'); onClose?.(); }}
+                    >
                         <MessageSquareDashed size={20} /> Чат-шаблоны
                     </a>
                 </div>
