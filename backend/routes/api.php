@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\PsychologistDiaryController;
 use App\Http\Controllers\Api\PsychologistEventController;
 use App\Http\Controllers\Api\PsychologistLoginLogController;
 use App\Http\Controllers\Api\PsychologistMoodController;
+use App\Http\Controllers\Api\PsychologistParentMaterialController;
 use App\Http\Controllers\Api\PsychologistUserController;
 use Illuminate\Support\Facades\Route;
 
@@ -53,4 +54,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/psychologist/chat-templates', [ChatTemplateController::class, 'store']);
     Route::put('/psychologist/chat-templates/{chatTemplate}', [ChatTemplateController::class, 'update']);
     Route::delete('/psychologist/chat-templates/{chatTemplate}', [ChatTemplateController::class, 'destroy']);
-});  
+
+    // Материалы для родителей
+    Route::get('/psychologist/parent-materials', [PsychologistParentMaterialController::class, 'index']);
+    Route::post('/psychologist/parent-materials', [PsychologistParentMaterialController::class, 'store']);
+    Route::put('/psychologist/parent-materials/{material}', [PsychologistParentMaterialController::class, 'update']);
+    Route::delete('/psychologist/parent-materials/{material}', [PsychologistParentMaterialController::class, 'destroy']);
+    Route::post('/psychologist/parent-materials/{material}/toggle-publish', [PsychologistParentMaterialController::class, 'togglePublish']);
+});
