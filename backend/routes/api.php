@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PsychologistDashboardController;
 use App\Http\Controllers\Api\PsychologistDiaryController;
+use App\Http\Controllers\Api\PsychologistEventController;
 use App\Http\Controllers\Api\PsychologistLoginLogController;
 use App\Http\Controllers\Api\PsychologistMoodController;
 use App\Http\Controllers\Api\PsychologistUserController;
@@ -31,4 +32,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/psychologist/diaries', [PsychologistDiaryController::class, 'index']);
     Route::get('/psychologist/diaries/export', [PsychologistDiaryController::class, 'export']);
+
+    Route::get('/psychologist/events', [PsychologistEventController::class, 'index']);
+    Route::post('/psychologist/events', [PsychologistEventController::class, 'store']);
+    Route::put('/psychologist/events/{id}', [PsychologistEventController::class, 'update']);
+    Route::delete('/psychologist/events/{id}', [PsychologistEventController::class, 'destroy']);
+
+    Route::get('/psychologist/events/{id}/attendance', [PsychologistEventController::class, 'attendance']);
+    Route::post('/psychologist/events/{id}/attendance', [PsychologistEventController::class, 'saveAttendance']);
 });

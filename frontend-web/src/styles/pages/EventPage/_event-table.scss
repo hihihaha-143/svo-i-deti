@@ -1,0 +1,98 @@
+// Плашка типа мероприятия
+.event-type-badge {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    border-radius: var(--radius-1);
+    white-space: nowrap;
+
+    &--psychologist {
+        background: var(--secondary-admin);
+        color: var(--primary-admin);
+    }
+
+    &--mentor {
+        background: #ede9fe;
+        color: #6d28d9;
+    }
+}
+
+// Бейдж количества занятий
+.event-lessons-badge {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    border-radius: var(--radius-1);
+    background: var(--bg-admin);
+    color: var(--text-admin);
+}
+
+// Список детей / счётчик
+.event-children {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 1.4rem;
+    color: var(--text-admin);
+}
+
+// Кнопка "Отметить"
+.event-attendance-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.2rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #ffffff;
+    background: var(--primary-admin);
+    border: none;
+    border-radius: var(--radius-1);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.15s;
+
+    &:hover {
+        opacity: 0.85;
+    }
+}
+
+// Кнопки действий (disabled)
+.users-table__action-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+
+    &:hover {
+        background: var(--bg-admin);
+        color: var(--text-admin);
+    }
+}
+
+// Заголовок страницы с кнопкой "Добавить"
+.event-page-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: var(--space-2);
+
+    &__add-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 1rem 2.4rem;
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: #ffffff;
+        background: var(--primary-admin);
+        border: none;
+        border-radius: var(--radius-1);
+        cursor: pointer;
+        transition: opacity 0.15s;
+        min-height: 4.4rem;
+
+        &:hover {
+            opacity: 0.9;
+        }
+    }
+}

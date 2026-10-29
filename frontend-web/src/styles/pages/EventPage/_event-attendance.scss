@@ -1,0 +1,210 @@
+.attendance-header {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+    flex-wrap: wrap;
+
+    &__back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.8rem 1.6rem;
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: var(--primary-admin);
+        background: #ffffff;
+        border: 1px solid var(--secondary-admin);
+        border-radius: var(--radius-1);
+        cursor: pointer;
+        transition: background 0.15s;
+
+        &:hover {
+            background: var(--bg-admin);
+        }
+    }
+
+    &__info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    &__title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-admin);
+        margin: 0 0 0.4rem 0;
+    }
+
+    &__subtitle {
+        font-size: 1.3rem;
+        color: var(--text-admin);
+        opacity: 0.7;
+    }
+}
+
+// Индикатор статуса сохранения
+.attendance-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 1.2rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    border-radius: var(--radius-1);
+    min-height: 3.6rem;
+    white-space: nowrap;
+
+    &--saving {
+        color: var(--text-admin);
+        background: var(--bg-admin);
+    }
+
+    &--saved {
+        color: #ffffff;
+        background: var(--right);
+    }
+
+    &--error {
+        color: #ffffff;
+        background: var(--wrong);
+    }
+
+    &--idle {
+        display: none;
+    }
+
+    &__spinner {
+        animation: attendance-spin 1s linear infinite;
+    }
+}
+
+@keyframes attendance-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+// Карточки занятий
+.attendance-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+    margin-bottom: var(--space-2);
+
+    @media (min-width: 769px) {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.6rem;
+    }
+}
+
+.attendance-card {
+    background: #ffffff;
+    border: 1px solid var(--secondary-admin);
+    border-radius: var(--radius-2);
+    padding: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: border-color 0.15s, box-shadow 0.15s;
+
+    &--marked {
+        border-color: var(--primary-admin);
+        box-shadow: 0 2px 8px rgba(16, 64, 154, 0.1);
+    }
+
+    &--actual {
+        border-color: var(--right);
+        background: #f0fdf4;
+        box-shadow: 0 2px 12px rgba(87, 226, 103, 0.15);
+    }
+
+    &--actual#{&}--marked {
+        background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+        border-color: var(--primary-admin);
+        box-shadow: 0 2px 12px rgba(16, 64, 154, 0.15);
+    }
+
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        padding-bottom: 0.8rem;
+        border-bottom: 1px solid var(--secondary-admin);
+    }
+
+    &__title {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-admin);
+    }
+
+    &__actual-badge {
+        display: inline-block;
+        padding: 0.2rem 0.8rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: #ffffff;
+        background: var(--right);
+        border-radius: var(--radius-1);
+    }
+
+    &__date {
+        padding: 0.6rem;
+        font-size: 1.3rem;
+        font-family: inherit;
+        color: var(--text-admin);
+        background: #ffffff;
+        border: 1px solid var(--primary-admin);
+        border-radius: var(--radius-1);
+        outline: none;
+
+        &:focus {
+            border-color: var(--accent-admin);
+        }
+    }
+
+    &__children {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    &__child {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        font-size: 1.4rem;
+        color: var(--text-admin);
+        cursor: pointer;
+        padding: 0.4rem 0;
+
+        input[type="checkbox"] {
+            width: 1.8rem;
+            height: 1.8rem;
+            cursor: pointer;
+            accent-color: var(--primary-admin);
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .attendance-header {
+        flex-direction: column;
+        align-items: stretch;
+
+        &__back {
+            align-self: flex-start;
+        }
+    }
+
+    .attendance-status {
+        align-self: flex-start;
+    }
+}

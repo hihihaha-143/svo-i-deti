@@ -9,6 +9,8 @@ import UsersPage from './UsersPage';
 import LoginLogsPage from '../LoginLogsPage/LoginLogsPage';
 import MoodPage from '../MoodPage/MoodPage';
 import DiaryPage from '../DiaryPage/DiaryPage';
+import EventPage from '../EventPage/EventPage';
+import EventAttendancePage from '../EventPage/EventAttendancePage';
 import { useAuth } from '../../contexts/AuthContext';
 import apiClient from '../../api/client';
 
@@ -24,10 +26,12 @@ interface DashboardData {
     online_mentors: number;
 }
 
-type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries';
+type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries' | 'events' | 'event-attendance';
 
 const STORAGE_KEY = 'psychologist_current_page';
-const VALID_PAGES: PageKey[] = ['dashboard', 'users', 'login-logs', 'moods', 'diaries'];
+const VALID_PAGES: PageKey[] = [
+    'dashboard', 'users', 'login-logs', 'moods', 'diaries', 'events', 'event-attendance',
+];
 
 function isValidPage(value: string | null): value is PageKey {
     return value !== null && (VALID_PAGES as string[]).includes(value);
@@ -38,6 +42,7 @@ export default function PsychologistDashboard() {
     const [searchParams, setSearchParams] = useSearchParams();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [stats, setStats] = useState<DashboardData | null>(null);
+    const [activeEventId, setActiveEventId] = useState<number | null>(null);
 
     const initialPage = (() => {
         const fromUrl = searchParams.get('page');
@@ -49,14 +54,40 @@ export default function PsychologistDashboard() {
         return 'dashboard';
     })();
 
+    const initialEventId = (() => {
+        const fromUrl = searchParams.get('event_id');
+        if (fromUrl && !isNaN(Number(fromUrl))) return Number(fromUrl);
+        return null;
+    })();
+
     const [currentPage, setCurrentPage] = useState<PageKey>(initialPage);
 
     useEffect(() => {
-        if (searchParams.get('page') !== currentPage) {
-            setSearchParams({ page: currentPage }, { replace: true });
+        if (initialEventId !== null) {
+            setActiveEventId(initialEventId);
         }
-        localStorage.setItem(STORAGE_KEY, currentPage);
-    }, [currentPage, searchParams, setSearchParams]);
+    }, []);
+
+    useEffect(() => {
+        const params: Record<string, string> = { page: currentPage };
+        if (currentPage === 'event-attendance' && activeEventId !== null) {
+            params.event_id = String(activeEventId);
+        }
+
+        const currentPageParam = searchParams.get('page');
+        const currentEventParam = searchParams.get('event_id');
+
+        if (
+            currentPageParam !== params.page ||
+            currentEventParam !== (params.event_id ?? null)
+        ) {
+            setSearchParams(params, { replace: true });
+        }
+
+        if (currentPage !== 'event-attendance') {
+            localStorage.setItem(STORAGE_KEY, currentPage);
+        }
+    }, [currentPage, activeEventId, searchParams, setSearchParams]);
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -72,6 +103,16 @@ export default function PsychologistDashboard() {
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
     const closeSidebar = () => setIsSidebarOpen(false);
+
+    const handleOpenAttendance = (eventId: number) => {
+        setActiveEventId(eventId);
+        setCurrentPage('event-attendance');
+    };
+
+    const handleBackFromAttendance = () => {
+        setActiveEventId(null);
+        setCurrentPage('events');
+    };
 
     const swipeHandlers = useSwipeable({
         onSwipedRight: (eventData) => {
@@ -91,6 +132,8 @@ export default function PsychologistDashboard() {
         'login-logs': 'Мониторинг входов',
         moods: 'Настроения детей',
         diaries: 'Дневники родителей',
+        events: 'Мероприятия',
+        'event-attendance': 'Посещаемость мероприятия',
     };
 
     const renderPage = () => {
@@ -130,7 +173,24 @@ export default function PsychologistDashboard() {
             return <MoodPage />;
         }
 
-        return <DiaryPage />;
+        if (currentPage === 'diaries') {
+            return <DiaryPage />;
+        }
+
+        if (currentPage === 'events') {
+            return <EventPage onOpenAttendance={handleOpenAttendance} />;
+        }
+
+        if (currentPage === 'event-attendance' && activeEventId !== null) {
+            return (
+                <EventAttendancePage
+                    eventId={activeEventId}
+                    onBack={handleBackFromAttendance}
+                />
+            );
+        }
+
+        return null;
     };
 
     return (

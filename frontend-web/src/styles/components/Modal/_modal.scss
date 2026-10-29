@@ -17,8 +17,12 @@
     border-radius: var(--radius-2);
     width: 100%;
     max-width: 600px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     animation: modalSlideIn 0.3s ease-out;
+    overflow: hidden;
 
     &__header {
         display: flex;
@@ -26,10 +30,11 @@
         align-items: center;
         padding: 2rem 3rem;
         border-bottom: 1px solid var(--secondary-admin);
+        flex-shrink: 0;
     }
 
     &__title {
-        font-size: 2rem !important; // Принудительно перебиваем глобальные стили
+        font-size: 2rem !important;
         font-weight: 700 !important;
         color: var(--text-admin) !important;
         margin: 0 !important;
@@ -55,6 +60,8 @@
 
     &__body {
         padding: 3rem;
+        overflow-y: auto;
+        flex: 1 1 auto;
     }
 }
 
