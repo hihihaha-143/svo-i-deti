@@ -6,6 +6,7 @@ import UsersTableBlock from './UsersTableBlock';
 import UserForm from './UserForm';
 import Modal from '../../components/Modal/Modal';
 import PasswordModal from '../../components/PasswordModal/PasswordModal';
+import useToast from '../../hooks/useToast';
 
 interface UserData {
     id: number;
@@ -19,6 +20,8 @@ interface UserData {
     parent_id?: number;
 }
 
+type ExportType = 'all' | 'mentors' | 'parents' | 'children';
+
 export default function UsersPage() {
     const [activeTab, setActiveTab] = useState<'mentors' | 'parents' | 'children'>('mentors');
     const [data, setData] = useState<{ mentors: UserData[], parents: UserData[], children: UserData[] }>({
@@ -26,13 +29,15 @@ export default function UsersPage() {
     });
     const [search, setSearch] = useState('');
     const [isLoading, setIsLoading] = useState(true);
-    
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<UserData | null>(null);
 
     const [passwordModalOpen, setPasswordModalOpen] = useState(false);
     const [generatedPassword, setGeneratedPassword] = useState('');
     const [passwordUserName, setPasswordUserName] = useState('');
+
+    const { showToast } = useToast();
 
     const getRoleString = (tab: string) => {
         if (tab === 'mentors') return 'mentor';
@@ -57,8 +62,8 @@ export default function UsersPage() {
     }, []);
 
     const currentData = data[activeTab];
-    const filteredData = currentData.filter(user => 
-        user.name.toLowerCase().includes(search.toLowerCase()) || 
+    const filteredData = currentData.filter(user =>
+        user.name.toLowerCase().includes(search.toLowerCase()) ||
         user.login.toLowerCase().includes(search.toLowerCase())
     );
 
@@ -75,10 +80,9 @@ export default function UsersPage() {
     const handleDelete = async (user: UserData) => {
         if (window.confirm(`Вы уверены, что хотите удалить ${user.name}?`)) {
             try {
-                // Используем POST с _method = DELETE для обхода проблем с методом DELETE
-                await apiClient.post(`/psychologist/users/${user.id}`, { 
+                await apiClient.post(`/psychologist/users/${user.id}`, {
                     _method: 'DELETE',
-                    role: getRoleString(activeTab) 
+                    role: getRoleString(activeTab)
                 });
                 fetchUsers();
             } catch (error) {
@@ -89,15 +93,14 @@ export default function UsersPage() {
 
     const handleRememberPassword = async (user: UserData) => {
         try {
-            // Используем POST с _method = PUT для обхода проблем с методом PUT
-            const response = await apiClient.post(`/psychologist/users/${user.id}`, { 
+            const response = await apiClient.post(`/psychologist/users/${user.id}`, {
                 _method: 'PUT',
-                name: user.name, 
-                login: user.login, 
+                name: user.name,
+                login: user.login,
                 role: getRoleString(activeTab),
                 generate_password: true
             });
-            
+
             if (response.data.generated_password) {
                 setGeneratedPassword(response.data.generated_password);
                 setPasswordUserName(user.name);
@@ -108,32 +111,67 @@ export default function UsersPage() {
         }
     };
 
+    const handleExport = async (type: ExportType) => {
+        const count =
+            type === 'all'
+                ? data.mentors.length + data.parents.length + data.children.length
+                : data[type].length;
+
+        if (count === 0) {
+            showToast('Нет пользователей для выгрузки', 'error');
+            return;
+        }
+
+        try {
+            const response = await apiClient.get('/psychologist/users/export', {
+                params: { type },
+                responseType: 'blob',
+            });
+
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `users-${type}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+
+            showToast('Файл выгружен', 'success');
+        } catch (error) {
+            console.error('Ошибка при экспорте:', error);
+            showToast('Ошибка при выгрузке файла', 'error');
+        }
+    };
+
     return (
         <div className="users-page">
-            <UsersHeaderBlock 
-                activeTab={activeTab} 
-                onTabChange={setActiveTab} 
+            <UsersHeaderBlock
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
                 counts={{ mentors: data.mentors.length, parents: data.parents.length, children: data.children.length }}
-                onAddClick={handleAddClick} 
+                onAddClick={handleAddClick}
+                onExport={handleExport}
             />
             <UsersFilterBlock search={search} onSearchChange={setSearch} />
-            <UsersTableBlock 
-                activeTab={activeTab} 
-                data={filteredData} 
-                isLoading={isLoading} 
+            <UsersTableBlock
+                activeTab={activeTab}
+                data={filteredData}
+                isLoading={isLoading}
                 onEdit={handleEdit}
                 onRememberPassword={handleRememberPassword}
                 onDelete={handleDelete}
             />
 
-            <Modal 
-                isOpen={isModalOpen} 
-                onClose={() => setIsModalOpen(false)} 
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
                 title={editingUser ? 'Редактировать пользователя' : 'Добавить пользователя'}
             >
-                <UserForm 
-                    initialData={editingUser} 
-                    activeTab={activeTab} 
+                <UserForm
+                    initialData={editingUser}
+                    activeTab={activeTab}
                     mentors={data.mentors}
                     parents={data.parents}
                     onSuccess={() => { setIsModalOpen(false); fetchUsers(); }}
@@ -141,9 +179,9 @@ export default function UsersPage() {
                 />
             </Modal>
 
-            <PasswordModal 
-                isOpen={passwordModalOpen} 
-                onClose={() => setPasswordModalOpen(false)} 
+            <PasswordModal
+                isOpen={passwordModalOpen}
+                onClose={() => setPasswordModalOpen(false)}
                 password={generatedPassword}
                 userName={passwordUserName}
             />
