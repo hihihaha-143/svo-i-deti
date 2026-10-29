@@ -1,0 +1,145 @@
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-2);
+    background-color: var(--bg-par);
+    color: var(--text-par);
+
+    &__card {
+        width: 100%;
+        max-width: 480px;
+        padding: var(--space-3) var(--space-2) var(--space-8);
+        background-color: #fffaf4;
+        border: 3px solid var(--text-par);
+        border-radius: var(--radius-3);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+        box-shadow: 0 10px 30px rgba(49, 30, 24, 0.1);
+    }
+
+    &__title {
+        text-align: center;
+        font-size: 2.4rem;
+        font-weight: 800;
+        color: var(--text-par);
+    }
+
+    &__subtitle {
+        text-align: center;
+        font-size: 1.4rem;
+        color: var(--text-par);
+        opacity: 0.8;
+        margin-top: calc(-1 * var(--space-1));
+    }
+
+    &__form {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+        margin-top: var(--space-1);
+    }
+
+    &__field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+
+    &__label {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: var(--text-par);
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    &__input-wrapper {
+        position: relative;
+    }
+
+    &__input {
+        width: 100%;
+        padding: 1.2rem 1.4rem;
+        font-size: 1.6rem;
+        border: 1.5px solid var(--text-par);
+        border-radius: var(--radius-1);
+        background-color: #fff;
+        color: var(--text-par);
+        outline: none;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+        &:focus {
+            border-color: var(--primary-par);
+            box-shadow: 0 0 0 3px rgba(144, 109, 69, 0.15);
+        }
+    }
+
+    &__password-toggle {
+        position: absolute;
+        right: 1.2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1.6rem;
+        color: var(--text-par);
+        opacity: 0.6;
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+
+    &__checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        font-size: 1.4rem;
+        color: var(--text-par);
+        cursor: pointer;
+
+        input[type="checkbox"] {
+            width: 1.8rem;
+            height: 1.8rem;
+            accent-color: var(--primary-par);
+            cursor: pointer;
+        }
+    }
+
+    &__submit {
+        margin-top: var(--space-1);
+        padding: 1.4rem;
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #fff;
+        background-color: var(--primary-par);
+        border: none;
+        border-radius: var(--radius-2);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        transition: opacity 0.2s ease;
+
+        &:hover {
+            opacity: 0.9;
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    }
+
+    &__error {
+        font-size: 1.3rem;
+        color: var(--wrong);
+        text-align: center;
+    }
+}

@@ -1,0 +1,97 @@
+/* CSS-переменные приложения */
+:root {
+    --right: #57e267;
+    --wrong: #f44346;
+    --clarify: #dd8329;
+
+    /* Базовые цвета */
+    --text-aufh: #311e18;
+    --bg: #fff2e0;
+
+    /* Скругления */
+    --radius-1: 1rem;
+    --radius-2: 2rem;
+    --radius-3: 3rem;
+
+    /* Отступы */
+    --space-1: 1rem;
+    --space-2: 2rem;
+    --space-3: 3rem;
+    --space-8: 8rem;
+
+    /* Цвета родителя */
+    --bg-par: #fff2e0;
+    --text-par: #311e18;
+    --primary-par: #906d45;
+    --secondary-par: #251b1b;
+    --accent-par: #abddf8;
+
+    /* Цвета ребёнка */
+    --primary-base: #b7e2bf;
+    --primary-sec: #95bfa0;
+    --secondary: #a47148;
+    --accent: #600000;
+
+    /* Цвета админа */
+    --bg-admin: #F5F7FA;
+    --text-admin: #10409A;
+    --primary-admin: #2871fa;
+    --secondary-admin: #B0CCFF;
+    --accent-admin: #792ad3;
+}
+
+/* Тема: мятная */
+[data-theme="mint"] {
+    --text: #311e18;
+    --bg: #fff2e0;
+    --primary-base: #b7e2bf;
+    --primary-sec: #95bfa0;
+    --secondary: #a47148;
+    --accent: #600000;
+}
+
+/* Тема: океан */
+[data-theme="ocean"] {
+    --text: #1c1c1c;
+    --bg: #fef3b3;
+    --primary-base: #e24439;
+    --primary-sec: #dd2013;
+    --secondary: #FFB000;
+    --accent: #18a7e9;
+}
+
+/* Шумовой фон для темы ocean */
+body[data-theme="ocean"]::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.3;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 400px 400px;
+}
+
+/* Тема: утка */
+[data-theme="duck"] {
+    --text: #1c1c1c;
+    --bg: #93abd9;
+    --primary-base: #f2619c;
+    --primary-sec: #df4180;
+    --secondary: #fff95b;
+    --accent: #e99e14;
+}
+
+/* Тема: космос */
+[data-theme="space"] {
+    --text: #f7ffea;
+    --bg: #290188;
+    --primary-base: #7d57d0;
+    --primary-sec: #a330a5;
+    --secondary: #f4b506;
+    --accent: #f7ffea;
+}
