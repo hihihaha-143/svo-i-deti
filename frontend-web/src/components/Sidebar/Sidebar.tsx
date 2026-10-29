@@ -1,14 +1,16 @@
 import {
-    LayoutDashboard, Users, DoorOpen, FileText, Smile, BookOpen, 
-    MessageSquareReply, CalendarDays, Clock, MessageCircle, 
+    LayoutDashboard, Users, DoorOpen, FileText, Smile, BookOpen,
+    MessageSquareReply, CalendarDays, Clock, MessageCircle,
     MessageSquareDashed, FolderOpen, Lightbulb, FileHeart, Puzzle, ListChecks, LogOut, X
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
+type PageKey = 'dashboard' | 'users' | 'login-logs';
+
 interface SidebarProps {
     onClose?: () => void;
-    onNavigate?: (page: 'dashboard' | 'users') => void;
+    onNavigate?: (page: PageKey) => void;
     currentPage?: string;
 }
 
@@ -35,21 +37,25 @@ export default function Sidebar({ onClose, onNavigate, currentPage }: SidebarPro
             <nav className="sidebar__nav">
                 <div className="sidebar__group">
                     <span className="sidebar__group-title">Основное</span>
-                    <a 
-                        href="#" 
+                    <a
+                        href="#"
                         className={`sidebar__link ${currentPage === 'dashboard' ? 'sidebar__link--active' : ''}`}
                         onClick={(e) => { e.preventDefault(); onNavigate?.('dashboard'); onClose?.(); }}
                     >
                         <LayoutDashboard size={20} /> Главная
                     </a>
-                    <a 
-                        href="#" 
+                    <a
+                        href="#"
                         className={`sidebar__link ${currentPage === 'users' ? 'sidebar__link--active' : ''}`}
                         onClick={(e) => { e.preventDefault(); onNavigate?.('users'); onClose?.(); }}
                     >
                         <Users size={20} /> Пользователи
                     </a>
-                    <a href="#" className="sidebar__link">
+                    <a
+                        href="#"
+                        className={`sidebar__link ${currentPage === 'login-logs' ? 'sidebar__link--active' : ''}`}
+                        onClick={(e) => { e.preventDefault(); onNavigate?.('login-logs'); onClose?.(); }}
+                    >
                         <DoorOpen size={20} /> Мониторинг входов
                     </a>
                     <a href="#" className="sidebar__link">

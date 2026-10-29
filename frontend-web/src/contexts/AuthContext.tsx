@@ -26,15 +26,25 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const TOKEN_KEY = 'auth_token';
+
+function getToken(): string | null {
+    return localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
+}
+
+function clearToken() {
+    localStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [profile, setProfile] = useState<Profile | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Загрузка пользователя при старте (проверка токена)
     useEffect(() => {
         const checkAuth = async () => {
-            const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+            const token = getToken();
             if (!token) {
                 setIsLoading(false);
                 return;
@@ -45,9 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 setUser(response.data.data.user);
                 setProfile(response.data.data.profile);
             } catch (error) {
-                // Токен протух или неверный
-                localStorage.removeItem('auth_token');
-                sessionStorage.removeItem('auth_token');
+                clearToken();
                 setUser(null);
                 setProfile(null);
             } finally {
@@ -56,6 +64,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
 
         checkAuth();
+
+        // Синхронизация между вкладками
+        const handleStorage = (e: StorageEvent) => {
+            if (e.key !== TOKEN_KEY) return;
+            if (e.newValue === null) {
+                // Токен удалён в другой вкладке — разлогиниваемся
+                setUser(null);
+                setProfile(null);
+            }
+        };
+
+        window.addEventListener('storage', handleStorage);
+        return () => window.removeEventListener('storage', handleStorage);
     }, []);
 
     const setAuthData = (newUser: User, newProfile: Profile) => {
@@ -64,10 +85,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     const logout = () => {
+        // best-effort: удаляем токен на бэкенде, не блокируя UI
+        apiClient.post('/logout').catch(() => {});
+
+        clearToken();
         setUser(null);
         setProfile(null);
-        localStorage.removeItem('auth_token');
-        sessionStorage.removeItem('auth_token');
     };
 
     return (

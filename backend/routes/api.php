@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PsychologistDashboardController;
+use App\Http\Controllers\Api\PsychologistLoginLogController;
 use App\Http\Controllers\Api\PsychologistUserController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,4 +21,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/psychologist/users/{id}', [PsychologistUserController::class, 'update']);
     Route::patch('/psychologist/users/{id}', [PsychologistUserController::class, 'update']);
     Route::delete('/psychologist/users/{id}', [PsychologistUserController::class, 'destroy']);
+
+    Route::get('/psychologist/login-logs', [PsychologistLoginLogController::class, 'index']);
 });

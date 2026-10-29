@@ -6,12 +6,6 @@
     margin-bottom: var(--space-2);
     flex-wrap: wrap;
 
-    &__title {
-        font-size: 2.4rem;
-        font-weight: 700;
-        color: var(--text-admin);
-        margin: 0;
-    }
 
     &__actions {
         display: flex;

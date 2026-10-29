@@ -87,13 +87,58 @@
         font-style: italic;
     }
 
+    // --- ПАГИНАЦИЯ (для таблиц с постраничным выводом, например "Мониторинг входов") ---
+    &__pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-1);
+        padding: var(--space-1) 0;
+        flex-wrap: wrap;
+    }
+
+    &__page-btn {
+        padding: 1rem 2rem;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #ffffff;
+        background: var(--primary-admin);
+        border: none;
+        border-radius: var(--radius-1);
+        cursor: pointer;
+        transition: opacity 0.15s;
+        min-height: 4.4rem;
+
+        &:hover:not(:disabled) {
+            opacity: 0.85;
+        }
+
+        &:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+    }
+
+    &__page-info {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-admin);
+        text-align: center;
+    }
+
+    &__total {
+        font-weight: 400;
+        opacity: 0.7;
+        font-size: 1.3rem;
+    }
+
     // --- АДАПТИВ (КАРТОЧКИ) ---
     @media (max-width: 768px) {
         overflow-x: visible;
 
         &__table {
             thead {
-                display: none; // Скрываем шапку таблицы
+                display: none;
             }
 
             tbody, tr, td {
@@ -123,7 +168,6 @@
                     padding-bottom: 0;
                 }
 
-                // Выводим подпись из data-label
                 &::before {
                     content: attr(data-label);
                     font-weight: 600;
@@ -143,10 +187,10 @@
             margin-top: 0.5rem;
 
             &::before {
-                display: none; // Убираем подпись "Действия"
+                display: none;
             }
         }
-        
+
         &__actions-header {
             display: none;
         }
@@ -156,5 +200,45 @@
             border: none;
             box-shadow: none;
         }
+
+        &__pagination {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        &__page-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+}
+
+// --- ПЛАШКА РОЛИ (для мониторинга входов) ---
+.login-role-badge {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    border-radius: var(--radius-1);
+    white-space: nowrap;
+
+    &--mentor {
+        background: var(--secondary-admin);
+        color: var(--primary-admin);
+    }
+
+    &--parent {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    &--child {
+        background: #fff3e0;
+        color: #e65100;
+    }
+
+    &--unknown {
+        background: var(--bg-admin);
+        color: var(--text-admin);
     }
 }

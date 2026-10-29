@@ -1,32 +1,143 @@
 .users-filter {
     margin-bottom: 2rem;
+    display: flex;
+    align-items: flex-end; /* Чтобы кнопка сброса была по нижнему краю инпутов */
+    gap: 1.2rem;
+    flex-wrap: wrap;
 
-    &__search {
-        position: relative;
-        max-width: 400px;
+    /* Обертка для поля (лейбл + инпут) */
+    &__field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        flex: 1 1 18rem;
+        min-width: 0;
+
+        /* Поиск делаем чуть шире остальных полей */
+        &--search {
+            flex: 1.5 1 24rem;
+        }
+
+        /* Кнопка сброса не растягивается */
+        &--reset {
+            flex: 0 0 auto;
+        }
     }
 
-    &__search-icon {
-        position: absolute;
-        left: 1.2rem;
-        top: 50%;
-        transform: translateY(-50%);
+    &__label {
+        font-size: 1.4rem;
+        font-weight: 600;
         color: var(--text-admin);
-        opacity: 0.5;
     }
 
+    /* Общие стили для инпутов и селектов */
+    &__select,
+    &__input,
     &__search input {
         width: 100%;
-        padding: 1.2rem 1.2rem 1.2rem 4rem;
+        padding: 1.2rem;
+        font-size: 1.5rem;
+        font-family: inherit;
+        color: var(--text-admin);
+        background: #ffffff;
         border: 1px solid var(--secondary-admin);
         border-radius: var(--radius-1);
-        font-size: 1.5rem;
-        color: var(--text-admin);
         outline: none;
         transition: border-color 0.2s;
 
         &:focus {
             border-color: var(--primary-admin);
+        }
+    }
+
+    /* Специфика селекта (стрелочка) */
+    &__select {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2310409A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1.2rem center;
+        padding-right: 3.6rem;
+    }
+
+    /* Обертка для поиска с иконкой */
+    &__search {
+        position: relative;
+        max-width: 400px;
+        flex: 1 1 300px;
+        width: 100%;
+    }
+
+    &__input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+
+    &__search-icon {
+        position: absolute;
+        left: 1.2rem;
+        top: 50%;                  /* <-- ВОЗВРАЩАЕМ */
+        transform: translateY(-50%); /* <-- ВОЗВРАЩАЕМ */
+        color: var(--text-admin);
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    /* Отступ для текста, чтобы не наезжал на иконку. 
+       Пишем ПОСЛЕ общего padding, чтобы перебить его */
+    &__search input,
+    &__input-wrapper &__input {
+        padding-left: 4rem;
+    }
+
+    /* Кнопка сброса */
+    &__reset-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 1.2rem 1.6rem;
+        font-size: 1.5rem;
+        font-weight: 600;
+        font-family: inherit;
+        color: var(--primary-admin);
+        background: #ffffff;
+        border: 2px solid var(--primary-admin);
+        border-radius: var(--radius-1);
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background 0.15s, color 0.15s;
+
+        &:hover {
+            background: var(--primary-admin);
+            color: #ffffff;
+        }
+    }
+}
+
+/* Адаптив для всех фильтров */
+@media (max-width: 1000px) {
+    .users-filter {
+        &__field {
+            flex: 1 1 40%;
+        }
+        &__field--search {
+            flex: 1 1 100%;
+        }
+        &__field--reset {
+            flex: 1 1 100%;
+        }
+    }
+}
+
+@media (max-width: 600px) {
+    .users-filter {
+        &__field {
+            flex: 1 1 100%;
+        }
+        &__search {
+            max-width: 100%;
         }
     }
 }

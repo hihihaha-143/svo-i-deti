@@ -12,8 +12,7 @@ export default function UsersHeaderBlock({ activeTab, onTabChange, counts, onAdd
     return (
         <>
             <div className="users-header">
-                <h1 className="users-header__title">Пользователи</h1>
-
+               
                 <div className="users-header__actions">
                     <div className="users-header__export">
                         <span className="users-header__export-label">
