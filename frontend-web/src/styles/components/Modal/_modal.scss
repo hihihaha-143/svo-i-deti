@@ -1,0 +1,70 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(16, 64, 154, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 2rem;
+}
+
+.modal {
+    background: #ffffff;
+    border-radius: var(--radius-2);
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    animation: modalSlideIn 0.3s ease-out;
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2rem 3rem;
+        border-bottom: 1px solid var(--secondary-admin);
+    }
+
+    &__title {
+        font-size: 2rem !important; // Принудительно перебиваем глобальные стили
+        font-weight: 700 !important;
+        color: var(--text-admin) !important;
+        margin: 0 !important;
+        line-height: 1.2 !important;
+    }
+
+    &__close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-admin);
+        opacity: 0.6;
+        transition: opacity 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+
+    &__body {
+        padding: 3rem;
+    }
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

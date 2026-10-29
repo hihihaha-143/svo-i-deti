@@ -1,0 +1,32 @@
+.users-filter {
+    margin-bottom: 2rem;
+
+    &__search {
+        position: relative;
+        max-width: 400px;
+    }
+
+    &__search-icon {
+        position: absolute;
+        left: 1.2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-admin);
+        opacity: 0.5;
+    }
+
+    &__search input {
+        width: 100%;
+        padding: 1.2rem 1.2rem 1.2rem 4rem;
+        border: 1px solid var(--secondary-admin);
+        border-radius: var(--radius-1);
+        font-size: 1.5rem;
+        color: var(--text-admin);
+        outline: none;
+        transition: border-color 0.2s;
+
+        &:focus {
+            border-color: var(--primary-admin);
+        }
+    }
+}

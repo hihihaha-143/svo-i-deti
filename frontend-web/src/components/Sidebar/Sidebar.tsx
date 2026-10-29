@@ -8,9 +8,11 @@ import { useNavigate } from 'react-router-dom';
 
 interface SidebarProps {
     onClose?: () => void;
+    onNavigate?: (page: 'dashboard' | 'users') => void;
+    currentPage?: string;
 }
 
-export default function Sidebar({ onClose }: SidebarProps) {
+export default function Sidebar({ onClose, onNavigate, currentPage }: SidebarProps) {
     const { logout } = useAuth();
     const navigate = useNavigate();
 
@@ -33,10 +35,18 @@ export default function Sidebar({ onClose }: SidebarProps) {
             <nav className="sidebar__nav">
                 <div className="sidebar__group">
                     <span className="sidebar__group-title">Основное</span>
-                    <a href="#" className="sidebar__link sidebar__link--active">
+                    <a 
+                        href="#" 
+                        className={`sidebar__link ${currentPage === 'dashboard' ? 'sidebar__link--active' : ''}`}
+                        onClick={(e) => { e.preventDefault(); onNavigate?.('dashboard'); onClose?.(); }}
+                    >
                         <LayoutDashboard size={20} /> Главная
                     </a>
-                    <a href="#" className="sidebar__link">
+                    <a 
+                        href="#" 
+                        className={`sidebar__link ${currentPage === 'users' ? 'sidebar__link--active' : ''}`}
+                        onClick={(e) => { e.preventDefault(); onNavigate?.('users'); onClose?.(); }}
+                    >
                         <Users size={20} /> Пользователи
                     </a>
                     <a href="#" className="sidebar__link">

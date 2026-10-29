@@ -1,0 +1,22 @@
+import { Search } from 'lucide-react';
+
+interface UsersFilterBlockProps {
+    search: string;
+    onSearchChange: (value: string) => void;
+}
+
+export default function UsersFilterBlock({ search, onSearchChange }: UsersFilterBlockProps) {
+    return (
+        <div className="users-filter">
+            <div className="users-filter__search">
+                <Search size={20} className="users-filter__search-icon" />
+                <input 
+                    type="text" 
+                    placeholder="Поиск по имени или логину..." 
+                    value={search}
+                    onChange={(e) => onSearchChange(e.target.value)}
+                />
+            </div>
+        </div>
+    );
+}

@@ -1,0 +1,101 @@
+.user-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+
+    &__field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+
+        label {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-admin);
+        }
+
+        input, select {
+            padding: 1.2rem;
+            border: 1px solid var(--secondary-admin);
+            border-radius: var(--radius-1);
+            font-size: 1.5rem;
+            color: var(--text-admin);
+            outline: none;
+            width: 100%;
+
+            &:focus {
+                border-color: var(--primary-admin);
+            }
+        }
+    }
+
+    &__password-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+
+        input {
+            width: 100%;
+            padding-right: 4.5rem; // Отступ для кнопки
+        }
+    }
+
+    &__generate-btn {
+        position: absolute;
+        right: 1.2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-admin);
+        opacity: 0.6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.2s;
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+
+    &__error {
+        color: var(--wrong);
+        font-size: 1.4rem;
+        text-align: center;
+    }
+
+    &__actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    &__btn {
+        padding: 1.2rem 2.4rem;
+        border-radius: var(--radius-1);
+        font-size: 1.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: opacity 0.2s;
+
+        &--cancel {
+            background: var(--bg-admin);
+            color: var(--text-admin);
+            border: 1px solid var(--secondary-admin);
+        }
+
+        &--submit {
+            background: var(--primary-admin);
+            color: #ffffff;
+        }
+
+        &:hover {
+            opacity: 0.9;
+        }
+    }
+}

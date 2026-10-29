@@ -1,0 +1,62 @@
+.users-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+
+    &__title {
+        font-size: 2.4rem;
+        font-weight: 700;
+        color: var(--text-admin);
+    }
+
+    &__add-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        background-color: var(--primary-admin);
+        color: #ffffff;
+        border: none;
+        border-radius: var(--radius-1);
+        padding: 1.2rem 2rem;
+        font-size: 1.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity 0.2s;
+
+        &:hover {
+            opacity: 0.9;
+        }
+    }
+
+    &__tabs {
+        display: flex;
+        gap: 2rem;
+        border-bottom: 2px solid var(--secondary-admin);
+        margin-bottom: 2rem;
+    }
+
+    &__tab {
+        background: none;
+        border: none;
+        padding: 1rem 0;
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: var(--text-admin);
+        opacity: 0.6;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -2px;
+        transition: all 0.2s ease;
+
+        &:hover {
+            opacity: 1;
+        }
+
+        &--active {
+            color: var(--primary-admin);
+            opacity: 1;
+            border-bottom-color: var(--primary-admin);
+        }
+    }
+}

@@ -4,23 +4,27 @@ import { Menu, Smile } from 'lucide-react';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import StatsCardsBlock from './StatsCardsBlock';
 import OnlineCardsBlock from './OnlineCardsBlock';
+import UsersPage from './UsersPage';
 import { useAuth } from '../../contexts/AuthContext';
 import apiClient from '../../api/client';
 
 interface DashboardData {
     children: number;
     parents: number;
+    mentors: number;
     anketas: number;
     messages: number;
     online_total: number;
     online_children: number;
     online_parents: number;
+    online_mentors: number;
 }
 
 export default function PsychologistDashboard() {
     const { user } = useAuth();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [stats, setStats] = useState<DashboardData | null>(null);
+    const [currentPage, setCurrentPage] = useState<'dashboard' | 'users'>('dashboard');
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -56,7 +60,8 @@ export default function PsychologistDashboard() {
             )}
 
             <div className={`dashboard-layout__sidebar-wrapper ${isSidebarOpen ? 'dashboard-layout__sidebar-wrapper--open' : ''}`}>
-                <Sidebar onClose={closeSidebar} />
+                {/* Передаем в Sidebar функцию смены страницы через контекст или пропсы (сейчас временно через пропс) */}
+                <Sidebar onClose={closeSidebar} onNavigate={(page) => setCurrentPage(page)} currentPage={currentPage} />
             </div>
 
             <main className="dashboard-content">
@@ -64,29 +69,35 @@ export default function PsychologistDashboard() {
                     <button className="dashboard-content__burger" onClick={toggleSidebar}>
                         <Menu size={28} />
                     </button>
-                    <h1>Главная</h1>
+                    <h1>{currentPage === 'dashboard' ? 'Главная' : 'Пользователи'}</h1>
                     <div className="dashboard-content__user">
                         {user?.name}
                     </div>
                 </header>
                 
                 <div className="dashboard-content__body">
-                    <div className="dashboard-welcome">
-                        <h2 className="dashboard-welcome__title">
-                            <Smile size={28} /> Добро пожаловать в Ваш личный кабинет
-                        </h2>
-                        <p className="dashboard-welcome__subtitle">
-                            Здесь вы видите, что делают дети и родители
-                        </p>
-                    </div>
-
-                    {stats ? (
+                    {currentPage === 'dashboard' ? (
                         <>
-                            <StatsCardsBlock data={stats} />
-                            <OnlineCardsBlock data={stats} />
+                            <div className="dashboard-welcome">
+                                <h2 className="dashboard-welcome__title">
+                                    <Smile size={28} /> Добро пожаловать в Ваш личный кабинет
+                                </h2>
+                                <p className="dashboard-welcome__subtitle">
+                                    Здесь вы видите, что делают дети и родители
+                                </p>
+                            </div>
+
+                            {stats ? (
+                                <>
+                                    <StatsCardsBlock data={stats} />
+                                    <OnlineCardsBlock data={stats} />
+                                </>
+                            ) : (
+                                <div>Загрузка статистики...</div>
+                            )}
                         </>
                     ) : (
-                        <div>Загрузка статистики...</div>
+                        <UsersPage />
                     )}
                 </div>
             </main>
