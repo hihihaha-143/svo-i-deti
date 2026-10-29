@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PsychologistDashboardController;
 use App\Http\Controllers\Api\PsychologistLoginLogController;
+use App\Http\Controllers\Api\PsychologistMoodController;
 use App\Http\Controllers\Api\PsychologistUserController;
 use Illuminate\Support\Facades\Route;
 
@@ -23,4 +24,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/psychologist/users/{id}', [PsychologistUserController::class, 'destroy']);
 
     Route::get('/psychologist/login-logs', [PsychologistLoginLogController::class, 'index']);
+
+    Route::get('/psychologist/moods', [PsychologistMoodController::class, 'index']);
+    Route::get('/psychologist/moods/export', [PsychologistMoodController::class, 'export']);
 });

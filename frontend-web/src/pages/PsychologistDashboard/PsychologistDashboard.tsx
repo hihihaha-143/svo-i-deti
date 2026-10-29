@@ -7,6 +7,7 @@ import StatsCardsBlock from './StatsCardsBlock';
 import OnlineCardsBlock from './OnlineCardsBlock';
 import UsersPage from './UsersPage';
 import LoginLogsPage from '../LoginLogsPage/LoginLogsPage';
+import MoodPage from '../MoodPage/MoodPage';
 import { useAuth } from '../../contexts/AuthContext';
 import apiClient from '../../api/client';
 
@@ -22,10 +23,10 @@ interface DashboardData {
     online_mentors: number;
 }
 
-type PageKey = 'dashboard' | 'users' | 'login-logs';
+type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods';
 
 const STORAGE_KEY = 'psychologist_current_page';
-const VALID_PAGES: PageKey[] = ['dashboard', 'users', 'login-logs'];
+const VALID_PAGES: PageKey[] = ['dashboard', 'users', 'login-logs', 'moods'];
 
 function isValidPage(value: string | null): value is PageKey {
     return value !== null && (VALID_PAGES as string[]).includes(value);
@@ -37,7 +38,6 @@ export default function PsychologistDashboard() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [stats, setStats] = useState<DashboardData | null>(null);
 
-    // Определяем стартовую страницу: URL → localStorage → dashboard
     const initialPage = (() => {
         const fromUrl = searchParams.get('page');
         if (isValidPage(fromUrl)) return fromUrl;
@@ -50,7 +50,6 @@ export default function PsychologistDashboard() {
 
     const [currentPage, setCurrentPage] = useState<PageKey>(initialPage);
 
-    // Синхронизация с URL и localStorage при смене страницы
     useEffect(() => {
         if (searchParams.get('page') !== currentPage) {
             setSearchParams({ page: currentPage }, { replace: true });
@@ -89,6 +88,7 @@ export default function PsychologistDashboard() {
         dashboard: 'Главная',
         users: 'Пользователи',
         'login-logs': 'Мониторинг входов',
+        moods: 'Настроения детей',
     };
 
     const renderPage = () => {
@@ -120,7 +120,11 @@ export default function PsychologistDashboard() {
             return <UsersPage />;
         }
 
-        return <LoginLogsPage />;
+        if (currentPage === 'login-logs') {
+            return <LoginLogsPage />;
+        }
+
+        return <MoodPage />;
     };
 
     return (

@@ -1,0 +1,48 @@
+// Плашка "Зона риска"
+.mood-risk {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    white-space: nowrap;
+
+    &--yes {
+        color: var(--wrong);
+    }
+
+    &--no {
+        color: var(--text-admin);
+        opacity: 0.6;
+    }
+}
+
+// Плашка "Настроение"
+.mood-badge {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    border-radius: var(--radius-1);
+    white-space: nowrap;
+
+    &--good {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    &--normal {
+        background: #fff3e0;
+        color: #e65100;
+    }
+
+    &--bad {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    &--unknown {
+        background: var(--bg-admin);
+        color: var(--text-admin);
+    }
+}

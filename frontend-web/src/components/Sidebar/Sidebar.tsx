@@ -6,7 +6,7 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
-type PageKey = 'dashboard' | 'users' | 'login-logs';
+type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods';
 
 interface SidebarProps {
     onClose?: () => void;
@@ -65,7 +65,11 @@ export default function Sidebar({ onClose, onNavigate, currentPage }: SidebarPro
 
                 <div className="sidebar__group">
                     <span className="sidebar__group-title">Дети</span>
-                    <a href="#" className="sidebar__link">
+                    <a
+                        href="#"
+                        className={`sidebar__link ${currentPage === 'moods' ? 'sidebar__link--active' : ''}`}
+                        onClick={(e) => { e.preventDefault(); onNavigate?.('moods'); onClose?.(); }}
+                    >
                         <Smile size={20} /> Настроения детей
                     </a>
                     <a href="#" className="sidebar__link">

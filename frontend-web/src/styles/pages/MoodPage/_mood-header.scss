@@ -1,0 +1,42 @@
+.mood-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Кнопка прижата вправо */
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+    flex-wrap: wrap;
+
+    &__export-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 1rem 2.4rem;
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: #ffffff;
+        background: var(--primary-admin);
+        border: none;
+        border-radius: var(--radius-1);
+        cursor: pointer;
+        transition: opacity 0.15s;
+        min-height: 4.4rem;
+
+        &:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    }
+}
+
+@media (max-width: 600px) {
+    .mood-header {
+        &__export-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+}

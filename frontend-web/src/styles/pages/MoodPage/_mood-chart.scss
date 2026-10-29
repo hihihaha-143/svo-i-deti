@@ -1,0 +1,58 @@
+.mood-chart {
+    margin-bottom: var(--space-2);
+
+    &__header {
+        display: flex;
+        align-items: baseline;
+        gap: 1rem;
+        margin-bottom: var(--space-1);
+    }
+
+    &__title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text-admin);
+        margin: 0;
+    }
+
+    &__count {
+        font-size: 1.3rem;
+        color: var(--text-admin);
+        opacity: 0.6;
+    }
+
+    &__canvas {
+        background: #ffffff;
+        border: 1px solid var(--secondary-admin);
+        border-radius: var(--radius-2);
+        padding: 1.6rem;
+    }
+
+    &__empty {
+        background: var(--secondary-admin);
+        color: var(--text-admin);
+        padding: 2.4rem;
+        border-radius: var(--radius-2);
+        text-align: center;
+        font-size: 1.5rem;
+    }
+
+    &__tooltip {
+        background: #ffffff;
+        border: 1px solid var(--secondary-admin);
+        border-radius: var(--radius-1);
+        padding: 1rem 1.2rem;
+        font-size: 1.3rem;
+        color: var(--text-admin);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    &__tooltip-date {
+        font-weight: 700;
+        margin-bottom: 0.4rem;
+    }
+
+    &__tooltip-row {
+        line-height: 1.5;
+    }
+}
