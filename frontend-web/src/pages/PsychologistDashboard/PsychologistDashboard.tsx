@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSwipeable } from 'react-swipeable';
+import { useSearchParams } from 'react-router-dom';
 import { Menu, Smile } from 'lucide-react';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import StatsCardsBlock from './StatsCardsBlock';
@@ -23,11 +24,39 @@ interface DashboardData {
 
 type PageKey = 'dashboard' | 'users' | 'login-logs';
 
+const STORAGE_KEY = 'psychologist_current_page';
+const VALID_PAGES: PageKey[] = ['dashboard', 'users', 'login-logs'];
+
+function isValidPage(value: string | null): value is PageKey {
+    return value !== null && (VALID_PAGES as string[]).includes(value);
+}
+
 export default function PsychologistDashboard() {
     const { user } = useAuth();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [stats, setStats] = useState<DashboardData | null>(null);
-    const [currentPage, setCurrentPage] = useState<PageKey>('dashboard');
+
+    // Определяем стартовую страницу: URL → localStorage → dashboard
+    const initialPage = (() => {
+        const fromUrl = searchParams.get('page');
+        if (isValidPage(fromUrl)) return fromUrl;
+
+        const fromStorage = localStorage.getItem(STORAGE_KEY);
+        if (isValidPage(fromStorage)) return fromStorage;
+
+        return 'dashboard';
+    })();
+
+    const [currentPage, setCurrentPage] = useState<PageKey>(initialPage);
+
+    // Синхронизация с URL и localStorage при смене страницы
+    useEffect(() => {
+        if (searchParams.get('page') !== currentPage) {
+            setSearchParams({ page: currentPage }, { replace: true });
+        }
+        localStorage.setItem(STORAGE_KEY, currentPage);
+    }, [currentPage, searchParams, setSearchParams]);
 
     useEffect(() => {
         const fetchStats = async () => {
