@@ -14,6 +14,7 @@ import EventAttendancePage from '../EventPage/EventAttendancePage';
 import ChatTemplatesPage from '../ChatTemplatesPage/ChatTemplatesPage';
 import ParentMaterialsPage from '../ParentMaterialsPage/ParentMaterialsPage';
 import DailyTipsPage from '../DailyTipsPage/DailyTipsPage';
+import RecommendationsPage from '../RecommendationsPage/RecommendationsPage';
 import { useAuth } from '../../contexts/AuthContext';
 import apiClient from '../../api/client';
 
@@ -29,11 +30,11 @@ interface DashboardData {
     online_mentors: number;
 }
 
-type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries' | 'events' | 'event-attendance' | 'chat-templates' | 'parent-materials' | 'daily-tips';
+type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries' | 'events' | 'event-attendance' | 'chat-templates' | 'parent-materials' | 'daily-tips' | 'recommendations';
 
 const STORAGE_KEY = 'psychologist_current_page';
 const VALID_PAGES: PageKey[] = [
-    'dashboard', 'users', 'login-logs', 'moods', 'diaries', 'events', 'event-attendance', 'chat-templates', 'parent-materials', 'daily-tips',
+    'dashboard', 'users', 'login-logs', 'moods', 'diaries', 'events', 'event-attendance', 'chat-templates', 'parent-materials', 'daily-tips', 'recommendations',
 ];
 
 function isValidPage(value: string | null): value is PageKey {
@@ -140,6 +141,7 @@ export default function PsychologistDashboard() {
         'chat-templates': 'Чат-шаблоны для быстрых ответов',
         'parent-materials': 'Управление материалами',
         'daily-tips': 'Управление ежедневными советами',
+        'recommendations': 'Рекомендации родителям',
     };
 
     const renderPage = () => {
@@ -206,6 +208,10 @@ export default function PsychologistDashboard() {
 
         if (currentPage === 'daily-tips') {
             return <DailyTipsPage />;
+        }
+
+        if (currentPage === 'recommendations') {
+            return <RecommendationsPage />;
         }
 
         return null;

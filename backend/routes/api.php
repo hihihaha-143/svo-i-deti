@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\PsychologistEventController;
 use App\Http\Controllers\Api\PsychologistLoginLogController;
 use App\Http\Controllers\Api\PsychologistMoodController;
 use App\Http\Controllers\Api\PsychologistParentMaterialController;
+use App\Http\Controllers\Api\PsychologistRecommendationController;
 use App\Http\Controllers\Api\PsychologistUserController;
 use Illuminate\Support\Facades\Route;
 
@@ -68,4 +69,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/psychologist/daily-tips', [PsychologistDailyTipController::class, 'store']);
     Route::put('/psychologist/daily-tips/{tip}', [PsychologistDailyTipController::class, 'update']);
     Route::delete('/psychologist/daily-tips/{tip}', [PsychologistDailyTipController::class, 'destroy']);
+
+    // Рекомендации родителям
+    Route::get('/psychologist/recommendations', [PsychologistRecommendationController::class, 'index']);
+    Route::post('/psychologist/recommendations', [PsychologistRecommendationController::class, 'store']);
+    Route::put('/psychologist/recommendations/{recommendation}', [PsychologistRecommendationController::class, 'update']);
+    Route::delete('/psychologist/recommendations/{recommendation}', [PsychologistRecommendationController::class, 'destroy']);
+    Route::post('/psychologist/recommendations/{recommendation}/mark-unread', [PsychologistRecommendationController::class, 'markAsUnread']);
 });
