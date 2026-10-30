@@ -6,7 +6,7 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
-type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries' | 'events' | 'event-attendance' | 'chat-templates' | 'parent-materials' | 'daily-tips' | 'recommendations';
+type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries' | 'events' | 'event-attendance' | 'chat-templates' | 'parent-materials' | 'daily-tips' | 'recommendations' | 'tests' | 'test-results';
 
 interface SidebarProps {
     onClose?: () => void;
@@ -139,10 +139,18 @@ export default function Sidebar({ onClose, onNavigate, currentPage }: SidebarPro
 
                 <div className="sidebar__group">
                     <span className="sidebar__group-title">Тесты</span>
-                    <a href="#" className="sidebar__link">
+                    <a
+                        href="#"
+                        className={`sidebar__link ${currentPage === 'tests' ? 'sidebar__link--active' : ''}`}
+                        onClick={(e) => { e.preventDefault(); onNavigate?.('tests'); onClose?.(); }}
+                    >
                         <Puzzle size={20} /> Список тестов
                     </a>
-                    <a href="#" className="sidebar__link">
+                    <a
+                        href="#"
+                        className={`sidebar__link ${currentPage === 'test-results' ? 'sidebar__link--active' : ''}`}
+                        onClick={(e) => { e.preventDefault(); onNavigate?.('test-results'); onClose?.(); }}
+                    >
                         <ListChecks size={20} /> Результаты тестов
                     </a>
                 </div>

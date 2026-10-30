@@ -12,12 +12,13 @@ use App\Http\Controllers\Api\PsychologistLoginLogController;
 use App\Http\Controllers\Api\PsychologistMoodController;
 use App\Http\Controllers\Api\PsychologistParentMaterialController;
 use App\Http\Controllers\Api\PsychologistRecommendationController;
+use App\Http\Controllers\Api\PsychologistTestResultController;
 use App\Http\Controllers\Api\PsychologistUserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\MentorChildController;
 use App\Http\Controllers\Api\MentorMoodController;
-
-
+use App\Http\Controllers\Api\MentorEventController;
+use App\Http\Controllers\Api\PsychologistTestController;
 
 
 
@@ -85,12 +86,34 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/psychologist/recommendations/{recommendation}', [PsychologistRecommendationController::class, 'destroy']);
     Route::post('/psychologist/recommendations/{recommendation}/mark-unread', [PsychologistRecommendationController::class, 'markAsUnread']);
 
+
+    // Тесты
+    Route::get('/psychologist/tests', [PsychologistTestController::class, 'index']);
+    Route::get('/psychologist/tests/{id}', [PsychologistTestController::class, 'show']);
+    Route::post('/psychologist/tests', [PsychologistTestController::class, 'store']);
+    Route::put('/psychologist/tests/{id}', [PsychologistTestController::class, 'update']);
+    Route::delete('/psychologist/tests/{id}', [PsychologistTestController::class, 'destroy']);
+    Route::post('/psychologist/tests/upload-coloring', [PsychologistTestController::class, 'uploadColoring']);
+
+    // Результаты тестов
+    Route::get('/psychologist/test-results', [PsychologistTestResultController::class, 'index']);
+    Route::get('/psychologist/test-results/{attempt}', [PsychologistTestResultController::class, 'show']);
+    Route::put('/psychologist/test-results/{attempt}/superpowers', [PsychologistTestResultController::class, 'updateSuperpowers']);
+    Route::delete('/psychologist/test-results/{attempt}', [PsychologistTestResultController::class, 'destroy']);
+
+
     // Наставник
     Route::get('/mentor/dashboard', [MentorDashboardController::class, 'index']);
 
-        Route::get('/mentor/children', [MentorChildController::class, 'index']);
+    Route::get('/mentor/children', [MentorChildController::class, 'index']);
     Route::post('/mentor/children/{id}/reset-password', [MentorChildController::class, 'resetPassword']);
     Route::get('/mentor/moods', [MentorMoodController::class, 'index']);
+    Route::get('/mentor/events', [MentorEventController::class, 'index']);
+    Route::get('/mentor/events/{id}/attendance', [MentorEventController::class, 'attendance']);
+    Route::post('/mentor/events/{id}/attendance', [MentorEventController::class, 'saveAttendance']);
 
+    Route::post('/mentor/events', [MentorEventController::class, 'store']);
+    Route::put('/mentor/events/{id}', [MentorEventController::class, 'update']);
+    Route::delete('/mentor/events/{id}', [MentorEventController::class, 'destroy']);
 
-    });
+});

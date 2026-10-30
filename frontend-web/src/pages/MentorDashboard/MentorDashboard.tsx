@@ -6,6 +6,8 @@ import MentorSidebar, { type MentorPageKey } from './MentorSidebar';
 import MentorStatsCardsBlock from './MentorStatsCardsBlock';
 import MentorChildrenPage from './MentorChildrenPage';
 import MentorMoodPage from './MentorMoodPage';
+import MentorEventPage from './MentorEventPage';
+import MentorEventAttendancePage from './MentorEventAttendancePage';
 import { useAuth } from '../../contexts/AuthContext';
 import apiClient from '../../api/client';
 
@@ -43,6 +45,7 @@ export default function MentorDashboard() {
     const [searchParams, setSearchParams] = useSearchParams();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [stats, setStats] = useState<DashboardData | null>(null);
+    const [activeEventId, setActiveEventId] = useState<number | null>(null);
 
     const initialPage = (() => {
         const fromUrl = searchParams.get('page');
@@ -54,19 +57,40 @@ export default function MentorDashboard() {
         return 'dashboard';
     })();
 
+    const initialEventId = (() => {
+        const fromUrl = searchParams.get('event_id');
+        if (fromUrl && !isNaN(Number(fromUrl))) return Number(fromUrl);
+        return null;
+    })();
+
     const [currentPage, setCurrentPage] = useState<MentorPageKey>(initialPage);
 
     useEffect(() => {
+        if (initialEventId !== null) {
+            setActiveEventId(initialEventId);
+        }
+    }, []);
+
+    useEffect(() => {
         const params: Record<string, string> = { page: currentPage };
+        if (currentPage === 'events' && activeEventId !== null) {
+            params.event_id = String(activeEventId);
+        }
 
         const currentPageParam = searchParams.get('page');
+        const currentEventParam = searchParams.get('event_id');
 
-        if (currentPageParam !== params.page) {
+        if (
+            currentPageParam !== params.page ||
+            currentEventParam !== (params.event_id ?? null)
+        ) {
             setSearchParams(params, { replace: true });
         }
 
-        localStorage.setItem(STORAGE_KEY, currentPage);
-    }, [currentPage, searchParams, setSearchParams]);
+        if (!(currentPage === 'events' && activeEventId !== null)) {
+            localStorage.setItem(STORAGE_KEY, currentPage);
+        }
+    }, [currentPage, activeEventId, searchParams, setSearchParams]);
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -82,6 +106,16 @@ export default function MentorDashboard() {
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
     const closeSidebar = () => setIsSidebarOpen(false);
+
+    const handleOpenAttendance = (eventId: number) => {
+        setActiveEventId(eventId);
+        setCurrentPage('events');
+    };
+
+    const handleBackFromAttendance = () => {
+        setActiveEventId(null);
+        setCurrentPage('events');
+    };
 
     const swipeHandlers = useSwipeable({
         onSwipedRight: (eventData) => {
@@ -136,7 +170,15 @@ export default function MentorDashboard() {
         }
 
         if (currentPage === 'events') {
-            return <PageStub title="Мероприятия" />;
+            if (activeEventId !== null) {
+                return (
+                    <MentorEventAttendancePage
+                        eventId={activeEventId}
+                        onBack={handleBackFromAttendance}
+                    />
+                );
+            }
+            return <MentorEventPage onOpenAttendance={handleOpenAttendance} />;
         }
 
         if (currentPage === 'chat') {

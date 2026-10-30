@@ -15,6 +15,8 @@ import ChatTemplatesPage from '../ChatTemplatesPage/ChatTemplatesPage';
 import ParentMaterialsPage from '../ParentMaterialsPage/ParentMaterialsPage';
 import DailyTipsPage from '../DailyTipsPage/DailyTipsPage';
 import RecommendationsPage from '../RecommendationsPage/RecommendationsPage';
+import TestsPage from './TestsPage';
+import TestResultsPage from '../TestResultsPage/TestResultsPage';
 import { useAuth } from '../../contexts/AuthContext';
 import apiClient from '../../api/client';
 
@@ -30,11 +32,11 @@ interface DashboardData {
     online_mentors: number;
 }
 
-type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries' | 'events' | 'event-attendance' | 'chat-templates' | 'parent-materials' | 'daily-tips' | 'recommendations';
+type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries' | 'events' | 'event-attendance' | 'chat-templates' | 'parent-materials' | 'daily-tips' | 'recommendations' | 'tests' | 'test-results';
 
 const STORAGE_KEY = 'psychologist_current_page';
 const VALID_PAGES: PageKey[] = [
-    'dashboard', 'users', 'login-logs', 'moods', 'diaries', 'events', 'event-attendance', 'chat-templates', 'parent-materials', 'daily-tips', 'recommendations',
+    'dashboard', 'users', 'login-logs', 'moods', 'diaries', 'events', 'event-attendance', 'chat-templates', 'parent-materials', 'daily-tips', 'recommendations', 'tests', 'test-results',
 ];
 
 function isValidPage(value: string | null): value is PageKey {
@@ -142,6 +144,8 @@ export default function PsychologistDashboard() {
         'parent-materials': 'Управление материалами',
         'daily-tips': 'Управление ежедневными советами',
         'recommendations': 'Рекомендации родителям',
+        'tests': 'Список тестов',
+        'test-results': 'Результаты тестов',
     };
 
     const renderPage = () => {
@@ -212,6 +216,14 @@ export default function PsychologistDashboard() {
 
         if (currentPage === 'recommendations') {
             return <RecommendationsPage />;
+        }
+
+        if (currentPage === 'tests') {
+            return <TestsPage />;
+        }
+
+        if (currentPage === 'test-results') {
+            return <TestResultsPage />;
         }
 
         return null;
