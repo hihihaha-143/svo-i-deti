@@ -3,6 +3,7 @@ import {
     Award,
     Brain,
     ClipboardList,
+    Download,
     Flame,
     Handshake,
     Heart,
@@ -20,6 +21,7 @@ interface AnswerItem {
         id: number;
         text: string;
         type: string;
+        options: any;
     };
     answer: any;
     answered_at: string | null;
@@ -93,6 +95,7 @@ export default function TestResultViewModal({
     const [superpowers, setSuperpowers] = useState<Superpowers>(DEFAULT_SUPERPOWERS);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [isExporting, setIsExporting] = useState(false);
 
     useEffect(() => {
         if (!isOpen || attemptId === null) return;
@@ -129,16 +132,31 @@ export default function TestResultViewModal({
         return `${day}.${month}.${year} ${hh}:${mm}`;
     };
 
-    const formatAnswer = (answer: any): string => {
-        if (answer === null || answer === undefined || answer === '') return 'skipped';
-        if (typeof answer === 'string') return answer;
-        if (typeof answer === 'number') return String(answer);
-        if (Array.isArray(answer)) return answer.join(', ');
-        if (typeof answer === 'object') {
-            if ('value' in answer) return String(answer.value);
-            return JSON.stringify(answer);
+    const formatAnswer = (value: any, question: AnswerItem['question']): string => {
+        if (value === null || value === undefined || value === '') return 'skipped';
+
+        if (question.type === 'single' && value && typeof value === 'object' && 'option_id' in value) {
+            const options = Array.isArray(question.options) ? question.options : [];
+            const found = options.find((o: any) => Number(o.id) === Number(value.option_id));
+            return found ? String(found.text) : `Вариант #${value.option_id}`;
         }
-        return String(answer);
+
+        if (question.type === 'scale' && value && typeof value === 'object' && 'value' in value) {
+            return String(value.value);
+        }
+
+        if (question.type === 'luscher' && value && typeof value === 'object' && 'order' in value) {
+            return Array.isArray(value.order) ? value.order.join(' → ') : String(value.order);
+        }
+
+        if (typeof value === 'string') return value;
+        if (typeof value === 'number') return String(value);
+        if (Array.isArray(value)) return value.join(', ');
+        if (typeof value === 'object') {
+            if ('value' in value) return String(value.value);
+            return JSON.stringify(value);
+        }
+        return String(value);
     };
 
     const updateSuperpower = (key: QualityKey, value: number) => {
@@ -159,6 +177,31 @@ export default function TestResultViewModal({
             showToast(e.response?.data?.message || 'Ошибка сохранения', 'error');
         } finally {
             setIsSaving(false);
+        }
+    };
+
+    const handleExportPdf = async () => {
+        if (attemptId === null) return;
+
+        setIsExporting(true);
+        try {
+            const res = await apiClient.get(`/psychologist/test-results/${attemptId}/export`, {
+                responseType: 'blob',
+            });
+
+            const blob = new Blob([res.data], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `test-result-${attemptId}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        } catch (e: any) {
+            showToast('Не удалось сформировать PDF', 'error');
+        } finally {
+            setIsExporting(false);
         }
     };
 
@@ -189,7 +232,7 @@ export default function TestResultViewModal({
                                 answers.map(a => (
                                     <tr key={a.id}>
                                         <td data-label="Вопрос">{a.question.text}</td>
-                                        <td data-label="Ответ">{formatAnswer(a.answer)}</td>
+                                        <td data-label="Ответ">{formatAnswer(a.answer, a.question)}</td>
                                         <td data-label="Дата">{formatDate(a.answered_at)}</td>
                                     </tr>
                                 ))
@@ -206,6 +249,15 @@ export default function TestResultViewModal({
                             >
                                 <Award size={16} />
                                 {isFormOpen ? 'Скрыть оценку качества' : 'Поставить оценку качества'}
+                            </button>
+                            <button
+                                type="button"
+                                className="users-header__export-btn"
+                                onClick={handleExportPdf}
+                                disabled={isExporting}
+                            >
+                                <Download size={16} />
+                                {isExporting ? 'Формирование...' : 'Экспорт PDF'}
                             </button>
                         </div>
                     </div>

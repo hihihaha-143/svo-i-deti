@@ -9,6 +9,7 @@ use App\Models\TestAttempt;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PsychologistTestResultController extends Controller
 {
@@ -244,5 +245,91 @@ class PsychologistTestResultController extends Controller
             $payload[$key] = $superpowers->{$key};
         }
         return $payload;
+    }
+
+
+        /**
+     * Экспорт попытки в PDF (ответы + суперсилы ребёнка).
+     */
+    public function exportPdf(int $attemptId)
+    {
+        $attempt = TestAttempt::query()
+            ->with([
+                'test:id,title',
+                'user:id,name,login',
+                'answers.question:id,text,type,options',
+            ])
+            ->findOrFail($attemptId);
+
+        $superpowers = ChildSuperpower::query()
+            ->where('child_id', $attempt->user_id)
+            ->first();
+
+        $answers = $attempt->answers->map(function (TestAnswer $answer) {
+            return [
+                'question' => $answer->question->text,
+                'type' => $answer->question->type,
+                'answer' => $this->formatAnswerValue($answer->value_json, $answer->question),
+            ];
+        })->values()->all();
+
+        $superpowersRows = [];
+        if ($superpowers) {
+            foreach (ChildSuperpower::QUALITIES as $key => $label) {
+                $superpowersRows[] = [
+                    'label' => $label,
+                    'value' => (int) $superpowers->{$key},
+                ];
+            }
+        }
+
+        $generatedAt = now()->format('d.m.Y H:i');
+
+        $pdf = Pdf::loadView('pdf.test-result', [
+            'attempt' => $attempt,
+            'answers' => $answers,
+            'superpowersRows' => $superpowersRows,
+            'generatedAt' => $generatedAt,
+        ])->setPaper('a4', 'portrait');
+
+        $safeChild = preg_replace('/[^\p{L}\p{N}_-]+/u', '_', $attempt->user->name ?: $attempt->user->login);
+        $fileName = 'test-result-' . $attempt->id . '-' . trim($safeChild, '_') . '.pdf';
+
+        return $pdf->download($fileName);
+    }
+
+    private function formatAnswerValue($value, $question): string
+    {
+        if ($value === null || $value === undefined || $value === '') {
+            return 'skipped';
+        }
+
+        if ($question->type === 'single' && is_array($value) && array_key_exists('option_id', $value)) {
+            $options = is_array($question->options) ? $question->options : [];
+            foreach ($options as $option) {
+                if (is_array($option) && isset($option['id']) && (int) $option['id'] === (int) $value['option_id']) {
+                    return (string) ($option['text'] ?? ('Вариант #' . $value['option_id']));
+                }
+            }
+            return 'Вариант #' . $value['option_id'];
+        }
+
+        if ($question->type === 'scale' && is_array($value) && array_key_exists('value', $value)) {
+            return (string) $value['value'];
+        }
+
+        if ($question->type === 'luscher' && is_array($value) && array_key_exists('order', $value)) {
+            return is_array($value['order']) ? implode(' → ', $value['order']) : (string) $value['order'];
+        }
+
+        if (is_string($value)) {
+            return $value;
+        }
+
+        if (is_array($value) && array_key_exists('value', $value)) {
+            return (string) $value['value'];
+        }
+
+        return json_encode($value, JSON_UNESCAPED_UNICODE);
     }
 }
