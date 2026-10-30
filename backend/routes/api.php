@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ChatTemplateCategoryController;
 use App\Http\Controllers\Api\ChatTemplateController;
+use App\Http\Controllers\Api\MentorDashboardController;
 use App\Http\Controllers\Api\PsychologistDashboardController;
 use App\Http\Controllers\Api\PsychologistDailyTipController;
 use App\Http\Controllers\Api\PsychologistDiaryController;
@@ -20,6 +21,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
+    // Психолог
     Route::get('/psychologist/dashboard', [PsychologistDashboardController::class, 'index']);
 
     Route::get('/psychologist/users', [PsychologistUserController::class, 'index']);
@@ -76,4 +78,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/psychologist/recommendations/{recommendation}', [PsychologistRecommendationController::class, 'update']);
     Route::delete('/psychologist/recommendations/{recommendation}', [PsychologistRecommendationController::class, 'destroy']);
     Route::post('/psychologist/recommendations/{recommendation}/mark-unread', [PsychologistRecommendationController::class, 'markAsUnread']);
+
+    // Наставник
+    Route::get('/mentor/dashboard', [MentorDashboardController::class, 'index']);
 });

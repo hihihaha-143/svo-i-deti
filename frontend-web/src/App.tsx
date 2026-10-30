@@ -2,7 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LoginPage from './pages/LoginPage/LoginPage';
 import ProtectedRoute from './components/ProtectedRoute';
-import PsychologistDashboard from './pages/PsychologistDashboard/PsychologistDashboard'; // <-- импорт
+import PsychologistDashboard from './pages/PsychologistDashboard/PsychologistDashboard';
+import MentorDashboard from './pages/MentorDashboard/MentorDashboard';
 
 // Временная заглушка для остальных ролей
 function RoleStub({ title }: { title: string }) {
@@ -29,7 +30,7 @@ function App() {
                     </Route>
                     
                     <Route element={<ProtectedRoute allowedRole="mentor" />}>
-                        <Route path="/mentor" element={<RoleStub title="Дашборд Наставника" />} />
+                        <Route path="/mentor" element={<MentorDashboard />} />
                     </Route>
                     <Route element={<ProtectedRoute allowedRole="parent" />}>
                         <Route path="/parent" element={<RoleStub title="Дашборд Родителя" />} />
