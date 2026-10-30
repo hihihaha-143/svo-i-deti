@@ -5,6 +5,7 @@ import { Menu, Smile } from 'lucide-react';
 import MentorSidebar, { type MentorPageKey } from './MentorSidebar';
 import MentorStatsCardsBlock from './MentorStatsCardsBlock';
 import MentorChildrenPage from './MentorChildrenPage';
+import MentorMoodPage from './MentorMoodPage';
 import { useAuth } from '../../contexts/AuthContext';
 import apiClient from '../../api/client';
 
@@ -131,7 +132,7 @@ export default function MentorDashboard() {
         }
 
         if (currentPage === 'moods') {
-            return <PageStub title="Настроения детей" />;
+            return <MentorMoodPage />;
         }
 
         if (currentPage === 'events') {

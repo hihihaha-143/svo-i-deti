@@ -15,6 +15,10 @@ use App\Http\Controllers\Api\PsychologistRecommendationController;
 use App\Http\Controllers\Api\PsychologistUserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\MentorChildController;
+use App\Http\Controllers\Api\MentorMoodController;
+
+
+
 
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -86,7 +90,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('/mentor/children', [MentorChildController::class, 'index']);
     Route::post('/mentor/children/{id}/reset-password', [MentorChildController::class, 'resetPassword']);
-
+    Route::get('/mentor/moods', [MentorMoodController::class, 'index']);
 
 
     });
