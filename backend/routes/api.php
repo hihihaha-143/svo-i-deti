@@ -95,13 +95,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/psychologist/tests/{id}', [PsychologistTestController::class, 'destroy']);
     Route::post('/psychologist/tests/upload-coloring', [PsychologistTestController::class, 'uploadColoring']);
 
-    // Результаты тестов
+       // Результаты тестов
     Route::get('/psychologist/test-results', [PsychologistTestResultController::class, 'index']);
+    Route::get('/psychologist/test-results/{attempt}/compare', [PsychologistTestResultController::class, 'compare']);
     Route::get('/psychologist/test-results/{attempt}', [PsychologistTestResultController::class, 'show']);
     Route::put('/psychologist/test-results/{attempt}/superpowers', [PsychologistTestResultController::class, 'updateSuperpowers']);
     Route::delete('/psychologist/test-results/{attempt}', [PsychologistTestResultController::class, 'destroy']);
 
-
+    
     // Наставник
     Route::get('/mentor/dashboard', [MentorDashboardController::class, 'index']);
 

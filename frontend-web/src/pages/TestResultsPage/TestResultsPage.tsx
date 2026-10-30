@@ -4,6 +4,7 @@ import useToast from '../../hooks/useToast';
 import TestResultsFilterBlock, { type TestResultsFilters } from './TestResultsFilterBlock';
 import TestResultsTableBlock, { type TestResultItem } from './TestResultsTableBlock';
 import TestResultViewModal from './TestResultViewModal';
+import TestResultCompareModal from './TestResultCompareModal';
 
 interface PaginationMeta {
     current_page: number;
@@ -30,6 +31,9 @@ export default function TestResultsPage() {
 
     const [viewAttemptId, setViewAttemptId] = useState<number | null>(null);
     const [isViewOpen, setIsViewOpen] = useState(false);
+
+    const [compareAttemptId, setCompareAttemptId] = useState<number | null>(null);
+    const [isCompareOpen, setIsCompareOpen] = useState(false);
 
     const fetchResults = useCallback(() => {
         setIsLoading(true);
@@ -68,8 +72,9 @@ export default function TestResultsPage() {
         setIsViewOpen(true);
     };
 
-    const handleCompare = (_item: TestResultItem) => {
-        showToast('Сравнение будет доступно позже', 'info');
+    const handleCompare = (item: TestResultItem) => {
+        setCompareAttemptId(item.id);
+        setIsCompareOpen(true);
     };
 
     const handleDelete = (item: TestResultItem) => {
@@ -101,6 +106,12 @@ export default function TestResultsPage() {
                 isOpen={isViewOpen}
                 onClose={() => setIsViewOpen(false)}
                 attemptId={viewAttemptId}
+            />
+
+            <TestResultCompareModal
+                isOpen={isCompareOpen}
+                onClose={() => setIsCompareOpen(false)}
+                attemptId={compareAttemptId}
             />
         </div>
     );

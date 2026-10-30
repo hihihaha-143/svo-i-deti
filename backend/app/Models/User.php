@@ -49,4 +49,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Child::class);
     }
+
+        public function superpowers()
+    {
+        return $this->hasOne(ChildSuperpower::class, 'child_id');
+    }
 }
