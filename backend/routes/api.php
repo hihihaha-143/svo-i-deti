@@ -141,7 +141,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
                 Route::get('/materials', [ParentDashboardController::class, 'materials']);
         Route::get('/materials/{id}', [ParentDashboardController::class, 'material']);
+        Route::post('/recommendations/{id}/read', [ParentDashboardController::class, 'markRecommendationRead']);
 
-        
+        Route::post('/tests/{testId}/start', [ParentDashboardController::class, 'startTest']);
+        Route::post('/tests/{testId}/answer', [ParentDashboardController::class, 'answerTest']);
+        Route::post('/tests/{testId}/finish', [ParentDashboardController::class, 'finishTest']);
+
+
     });
 });

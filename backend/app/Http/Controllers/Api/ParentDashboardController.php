@@ -12,6 +12,8 @@ use App\Models\Test;
 use App\Models\TestAttempt;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Models\TestAnswer;
+
 
 class ParentDashboardController extends Controller
 {
@@ -248,4 +250,155 @@ class ParentDashboardController extends Controller
             ],
         ]);
     }
+
+        public function markRecommendationRead(Request $request, $id)
+    {
+        $parent = $this->getParent($request);
+        if (!$parent) {
+            return response()->json(['message' => 'Профиль родителя не найден'], 403);
+        }
+
+        $recommendation = ParentRecommendation::where('parent_id', $parent->id)->findOrFail($id);
+
+        if (!$recommendation->is_read) {
+            $recommendation->update([
+                'is_read' => true,
+                'read_at' => now(),
+            ]);
+        }
+
+        return response()->json(['message' => 'Рекомендация прочитана']);
+    }
+
+
+        public function startTest(Request $request, $testId)
+    {
+        $parent = $this->getParent($request);
+        if (!$parent) {
+            return response()->json(['message' => 'Профиль родителя не найден'], 403);
+        }
+
+        $test = Test::where('is_active', true)
+            ->whereIn('for_whom', ['parent', 'both'])
+            ->with('questions')
+            ->findOrFail($testId);
+
+        // Проверяем, нет ли уже завершённой попытки
+        $existing = TestAttempt::where('test_id', $test->id)
+            ->where('user_id', $parent->user_id)
+            ->where('is_completed', true)
+            ->first();
+
+        if ($existing) {
+            return response()->json(['message' => 'Тест уже пройден'], 409);
+        }
+
+        // Создаём или находим незавершённую попытку
+        $attempt = TestAttempt::where('test_id', $test->id)
+            ->where('user_id', $parent->user_id)
+            ->where('is_completed', false)
+            ->first();
+
+        if (!$attempt) {
+            $attempt = TestAttempt::create([
+                'test_id' => $test->id,
+                'user_id' => $parent->user_id,
+                'is_completed' => false,
+            ]);
+        }
+
+        return response()->json([
+            'data' => [
+                'attempt_id' => $attempt->id,
+                'test' => [
+                    'id' => $test->id,
+                    'title' => $test->title,
+                    'description' => $test->description,
+                    'motivation_text' => $test->motivation_text,
+                    'questions' => $test->questions->map(function ($q) {
+                        return [
+                            'id' => $q->id,
+                            'question_text' => $q->question_text,
+                            'type' => $q->type,
+                            'order' => $q->order,
+                            'options' => $q->options,
+                            'scale_min_label' => $q->scale_min_label,
+                            'scale_max_label' => $q->scale_max_label,
+                            'allow_skip' => $q->allow_skip,
+                        ];
+                    })->sortBy('order')->values(),
+                ],
+            ],
+        ]);
+    }
+
+    public function answerTest(Request $request, $testId)
+    {
+        $parent = $this->getParent($request);
+        if (!$parent) {
+            return response()->json(['message' => 'Профиль родителя не найден'], 403);
+        }
+
+        $validated = $request->validate([
+            'attempt_id' => ['required', 'integer'],
+            'question_id' => ['required', 'integer'],
+            'value_json' => ['required'],
+        ]);
+
+        $attempt = TestAttempt::where('id', $validated['attempt_id'])
+            ->where('test_id', $testId)
+            ->where('user_id', $parent->user_id)
+            ->where('is_completed', false)
+            ->firstOrFail();
+
+        TestAnswer::updateOrCreate(
+            [
+                'attempt_id' => $attempt->id,
+                'question_id' => $validated['question_id'],
+            ],
+            [
+                'value_json' => $validated['value_json'],
+            ]
+        );
+
+        return response()->json(['message' => 'Ответ сохранён']);
+    }
+
+    public function finishTest(Request $request, $testId)
+    {
+        $parent = $this->getParent($request);
+        if (!$parent) {
+            return response()->json(['message' => 'Профиль родителя не найден'], 403);
+        }
+
+        $validated = $request->validate([
+            'attempt_id' => ['required', 'integer'],
+        ]);
+
+        $attempt = TestAttempt::where('id', $validated['attempt_id'])
+            ->where('test_id', $testId)
+            ->where('user_id', $parent->user_id)
+            ->where('is_completed', false)
+            ->firstOrFail();
+
+        // Считаем score = количество ответов (можно доработать под баллы, если нужно)
+        $score = TestAnswer::where('attempt_id', $attempt->id)->count();
+
+        $attempt->update([
+            'is_completed' => true,
+            'finished_at' => now(),
+            'score' => $score,
+        ]);
+
+        $test = Test::find($testId);
+
+        return response()->json([
+            'message' => 'Тест завершён',
+            'data' => [
+                'attempt_id' => $attempt->id,
+                'motivation_text' => $test?->motivation_text ?? 'Молодец, что прошёл тест!',
+            ],
+        ]);
+    }
+
 }

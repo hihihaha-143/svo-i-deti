@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, MessageCircle, Lightbulb, Users, Bell, ListTodo, Play, LogOut } from 'lucide-react';
+import { BookOpen, MessageCircle, Lightbulb, Users, Bell, ListTodo, Play, LogOut, Check } from 'lucide-react';
 import apiClient from '../../api/client';
 import { useAuth } from '../../contexts/AuthContext';
 import useToast from '../../hooks/useToast';
@@ -15,6 +15,7 @@ interface Child {
 interface Recommendation {
   id: number;
   text: string;
+  is_read: boolean;
   created_at: string;
 }
 
@@ -34,6 +35,7 @@ export default function ParentHomePage() {
   const [tests, setTests] = useState<Test[]>([]);
   const [dailyTip, setDailyTip] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [showAllRecommendations, setShowAllRecommendations] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -68,9 +70,24 @@ export default function ParentHomePage() {
     navigate(`/parent/test/${testId}`);
   };
 
+  const handleMarkRead = async (recId: number) => {
+    try {
+      await apiClient.post(`/parent/recommendations/${recId}/read`);
+      setRecommendations((prev) =>
+        prev.map((r) => (r.id === recId ? { ...r, is_read: true } : r))
+      );
+    } catch {
+      showToast('Ошибка обновления рекомендации', 'error');
+    }
+  };
+
   if (loading) {
     return <div className="parent-home__loading">Загрузка...</div>;
   }
+
+  const visibleRecommendations = showAllRecommendations
+    ? recommendations
+    : recommendations.slice(0, 3);
 
   return (
     <div className="parent-home">
@@ -129,13 +146,35 @@ export default function ParentHomePage() {
         {recommendations.length === 0 ? (
           <p className="parent-home__empty">Пока нет рекомендаций</p>
         ) : (
-          <ul className="parent-home__list">
-            {recommendations.map((rec) => (
-              <li key={rec.id} className="parent-home__list-item">
-                {rec.text}
-              </li>
-            ))}
-          </ul>
+          <>
+            <ul className="parent-home__recommendations">
+              {visibleRecommendations.map((rec) => (
+                <li
+                  key={rec.id}
+                  className={`parent-home__recommendation${!rec.is_read ? ' parent-home__recommendation--unread' : ''}`}
+                >
+                  <p className="parent-home__recommendation-text">{rec.text}</p>
+                  {!rec.is_read && (
+                    <button
+                      className="parent-home__recommendation-read-btn"
+                      onClick={() => handleMarkRead(rec.id)}
+                    >
+                      <Check size={14} />
+                      Прочитать
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ul>
+            {recommendations.length > 3 && (
+              <button
+                className="parent-home__show-all-btn"
+                onClick={() => setShowAllRecommendations(!showAllRecommendations)}
+              >
+                {showAllRecommendations ? 'Свернуть' : `Показать все (${recommendations.length})`}
+              </button>
+            )}
+          </>
         )}
       </div>
 

@@ -1,0 +1,276 @@
+@import '../../variables';
+
+.parent-test-passing {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 70rem;
+  margin: 0 auto;
+  width: 100%;
+
+  &__loading {
+    text-align: center;
+    padding: var(--space-2);
+    color: var(--text-par);
+    font-size: 1.6rem;
+  }
+
+  &__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: transparent;
+    border: none;
+    color: var(--text-par);
+    font-size: 1.4rem;
+    cursor: pointer;
+    padding: 0;
+    align-self: flex-start;
+    opacity: 0.8;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  &__title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text-par);
+    margin: 0;
+    text-align: center;
+  }
+
+  &__progress {
+    width: 100%;
+    height: 1rem;
+    background-color: rgba(144, 109, 69, 0.2);
+    border-radius: var(--radius-1);
+    overflow: hidden;
+  }
+
+  &__progress-bar {
+    height: 100%;
+    background-color: var(--primary-par);
+    transition: width 0.3s ease;
+  }
+
+  &__counter {
+    font-size: 1.4rem;
+    color: var(--text-par);
+    opacity: 0.8;
+    text-align: center;
+    margin: 0;
+  }
+
+  &__question {
+    background-color: var(--primary-par);
+    border-radius: var(--radius-2);
+    padding: var(--space-2);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  &__question-text {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--text-par);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  &__options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  &__option {
+    padding: 1.2rem 1.6rem;
+    background-color: #fff;
+    border: 0.2rem solid transparent;
+    border-radius: var(--radius-1);
+    font-size: 1.5rem;
+    color: var(--text-par);
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+
+    &:hover {
+      background-color: #fffaf2;
+    }
+
+    &--selected {
+      border-color: var(--secondary-par);
+      background-color: #fffaf2;
+      font-weight: 600;
+    }
+  }
+
+  &__scale {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    flex-wrap: wrap;
+  }
+
+  &__scale-label {
+    font-size: 1.3rem;
+    color: var(--text-par);
+    opacity: 0.8;
+  }
+
+  &__scale-input {
+    flex: 1;
+    min-width: 15rem;
+    accent-color: var(--secondary-par);
+  }
+
+  &__scale-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--secondary-par);
+    min-width: 3rem;
+    text-align: center;
+  }
+
+  &__luscher {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  &__luscher-hint {
+    font-size: 1.3rem;
+    color: var(--text-par);
+    opacity: 0.8;
+    margin: 0;
+  }
+
+  &__luscher-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  &__luscher-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.2rem 1.6rem;
+    background-color: #fff;
+    border-radius: var(--radius-1);
+    font-size: 1.5rem;
+    color: var(--text-par);
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  &__luscher-num {
+    font-weight: 700;
+    color: var(--secondary-par);
+    min-width: 2rem;
+  }
+
+  &__luscher-text {
+    flex: 1;
+  }
+
+  &__nav {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-1);
+  }
+
+  &__nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1.2rem 2rem;
+    border: none;
+    border-radius: var(--radius-1);
+    font-size: 1.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.9;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    &--prev {
+      background-color: var(--bg-par);
+      color: var(--text-par);
+      border: 0.1rem solid var(--primary-par);
+    }
+
+    &--next {
+      background-color: var(--secondary-par);
+      color: #fff;
+      margin-left: auto;
+    }
+  }
+
+  &__result {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    align-items: center;
+    text-align: center;
+  }
+
+  &__result-text {
+    font-size: 1.6rem;
+    line-height: 1.5;
+    color: var(--text-par);
+    margin: 0;
+  }
+
+  &__result-btn {
+    padding: 1.2rem 2.4rem;
+    background-color: var(--primary-par);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-1);
+    font-size: 1.5rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+}
+// Переопределение модалки под палитру родителя
+.parent-test-passing {
+  .modal {
+    &__header {
+      border-bottom-color: var(--primary-par);
+    }
+
+    &__title {
+      color: var(--text-par) !important;
+    }
+
+    &__close {
+      color: var(--text-par);
+    }
+  }
+
+  .modal-overlay {
+    background-color: rgba(49, 30, 24, 0.4);
+  }
+
+}
