@@ -128,11 +128,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/mentor/test-results', [MentorTestResultController::class, 'index']);
 
-    // Родитель
+      // Родитель
     Route::prefix('parent')->group(function () {
         Route::get('/children', [ParentDashboardController::class, 'children']);
         Route::get('/recommendations', [ParentDashboardController::class, 'recommendations']);
         Route::get('/tests', [ParentDashboardController::class, 'tests']);
         Route::get('/daily-tip', [ParentDashboardController::class, 'dailyTip']);
+
+        Route::get('/diaries', [ParentDashboardController::class, 'diaries']);
+        Route::post('/diaries', [ParentDashboardController::class, 'storeDiary']);
+        Route::delete('/diaries/{id}', [ParentDashboardController::class, 'destroyDiary']);
     });
 });
