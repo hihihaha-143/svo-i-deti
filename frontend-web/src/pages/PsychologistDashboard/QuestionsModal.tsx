@@ -239,21 +239,28 @@ export default function QuestionsModal({ isOpen, onClose, testId, onSuccess }: Q
                 {q.type === 'single' && (
                     <div className="event-form__field">
                         <label className="event-form__label">Варианты ответа *</label>
-                        {(q.options || []).map((opt: any, oi: number) => (
-                            <div key={oi} className="users-header__actions">
-                                <input
-                                    type="text"
-                                    className="event-form__input"
-                                    placeholder={`Вариант ${oi + 1}`}
-                                    value={opt.text || ''}
-                                    onChange={(e) => updateOption(index, oi, e.target.value)}
-                                />
-                                <button type="button" className="users-table__action-btn users-table__action-btn--delete" onClick={() => removeOption(index, oi)} title="Удалить вариант">
-                                    <X size={16} />
-                                </button>
-                            </div>
-                        ))}
-                        <button type="button" className="event-form__btn event-form__btn--submit" onClick={() => addOption(index)}>
+                        <div className="questions-modal__options">
+                            {(q.options || []).map((opt: any, oi: number) => (
+                                <div key={oi} className="questions-modal__option-row">
+                                    <input
+                                        type="text"
+                                        className="event-form__input questions-modal__option-input"
+                                        placeholder={`Вариант ${oi + 1}`}
+                                        value={opt.text || ''}
+                                        onChange={(e) => updateOption(index, oi, e.target.value)}
+                                    />
+                                    <button
+                                        type="button"
+                                        className="users-table__action-btn users-table__action-btn--delete"
+                                        onClick={() => removeOption(index, oi)}
+                                        title="Удалить вариант"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                        <button type="button" className="event-form__btn event-form__btn--submit questions-modal__add-option" onClick={() => addOption(index)}>
                             <Plus size={16} /> Добавить вариант
                         </button>
                     </div>

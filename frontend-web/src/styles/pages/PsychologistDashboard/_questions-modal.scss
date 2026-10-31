@@ -1,0 +1,26 @@
+.questions-modal {
+    &__options {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 1.2rem;
+    }
+
+    &__option-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    &__option-input {
+        flex: 1;
+        min-width: 0;
+    }
+
+    &__add-option {
+        align-self: flex-start;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+}

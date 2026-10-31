@@ -73,27 +73,35 @@ export default function TestResultCompareModal({
     const formatAnswer = (value: any, question: CompareQuestion): string => {
         if (value === null || value === undefined || value === '') return 'skipped';
 
-        if (question.type === 'single' && value && typeof value === 'object' && 'option_id' in value) {
-            const options = Array.isArray(question.options) ? question.options : [];
-            const found = options.find((o: any) => Number(o.id) === Number(value.option_id));
-            return found ? String(found.text) : `Вариант #${value.option_id}`;
+        if (question.type === 'single') {
+            if (typeof value === 'string') return value;
+            if (typeof value === 'object') {
+                if (typeof value.text === 'string' && value.text !== '') return value.text;
+
+                const options = Array.isArray(question.options) ? question.options : [];
+                const idx = value.index;
+                const optionId = value.option_id;
+
+                if (typeof idx === 'number' && options[idx]?.text) return options[idx].text;
+                if (typeof optionId === 'number' && options[optionId - 1]?.text) return options[optionId - 1].text;
+
+                return `Вариант #${optionId ?? '?'}`;
+            }
+            return String(value);
         }
 
-        if (question.type === 'scale' && value && typeof value === 'object' && 'value' in value) {
-            return String(value.value);
+        if (question.type === 'scale') {
+            if (typeof value === 'object' && 'value' in value) return String(value.value);
+            return String(value);
         }
 
-        if (question.type === 'luscher' && value && typeof value === 'object' && 'order' in value) {
-            return Array.isArray(value.order) ? value.order.join(' → ') : String(value.order);
-        }
-
-        if (typeof value === 'string') return value;
-        if (typeof value === 'number') return String(value);
-        if (Array.isArray(value)) return value.join(', ');
-        if (typeof value === 'object') {
-            if ('value' in value) return String(value.value);
+        if (question.type === 'luscher') {
+            if (typeof value === 'object' && 'order' in value && Array.isArray(value.order)) {
+                return value.order.join(' → ');
+            }
             return JSON.stringify(value);
         }
+
         return String(value);
     };
 
@@ -112,7 +120,7 @@ export default function TestResultCompareModal({
                     <p className="compare-empty__text">Нет предыдущей попытки для сравнения.</p>
                     <button
                         type="button"
-                        className="users-header__add-btn"
+                        className="compare-empty__btn"
                         onClick={() => showToast('Функция прохождения в разработке', 'info')}
                     >
                         <RotateCcw size={16} />
@@ -120,35 +128,37 @@ export default function TestResultCompareModal({
                     </button>
                 </div>
             ) : (
-                <>
-                    <div className="compare-meta">
+                <div className="compare-view">
+                    <div className="compare-view__meta">
                         Предыдущая попытка: {formatDate(data.previous_attempt?.completed_at ?? null)}
                     </div>
-                    <table className="users-table">
-                        <thead>
-                            <tr>
-                                <th>Вопрос</th>
-                                <th>Прошлый ответ</th>
-                                <th>Текущий ответ</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {(data.rows ?? []).length === 0 ? (
+                    <div className="compare-view__table-wrap">
+                        <table className="users-table__table compare-view__table">
+                            <thead>
                                 <tr>
-                                    <td colSpan={3}>Ответов нет</td>
+                                    <th>Вопрос</th>
+                                    <th className="compare-view__col">Прошлый ответ</th>
+                                    <th className="compare-view__col">Текущий ответ</th>
                                 </tr>
-                            ) : (
-                                (data.rows ?? []).map(row => (
-                                    <tr key={row.question.id}>
-                                        <td data-label="Вопрос">{row.question.text}</td>
-                                        <td data-label="Прошлый ответ">{formatAnswer(row.previous, row.question)}</td>
-                                        <td data-label="Текущий ответ">{formatAnswer(row.current, row.question)}</td>
+                            </thead>
+                            <tbody>
+                                {(data.rows ?? []).length === 0 ? (
+                                    <tr>
+                                        <td colSpan={3}>Ответов нет</td>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </>
+                                ) : (
+                                    (data.rows ?? []).map(row => (
+                                        <tr key={row.question.id}>
+                                            <td data-label="Вопрос">{row.question.text}</td>
+                                            <td data-label="Прошлый ответ">{formatAnswer(row.previous, row.question)}</td>
+                                            <td data-label="Текущий ответ">{formatAnswer(row.current, row.question)}</td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             )}
         </Modal>
     );

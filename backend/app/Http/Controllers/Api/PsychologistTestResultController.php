@@ -13,9 +13,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class PsychologistTestResultController extends Controller
 {
-    /**
-     * Список завершённых результатов тестов (попыток) с фильтрами и пагинацией.
-     */
     public function index(Request $request): JsonResponse
     {
         $query = TestAttempt::query()
@@ -26,15 +23,12 @@ class PsychologistTestResultController extends Controller
         if ($request->filled('child_id')) {
             $query->where('user_id', $request->integer('child_id'));
         }
-
         if ($request->filled('test_id')) {
             $query->where('test_id', $request->integer('test_id'));
         }
-
         if ($request->filled('date_from')) {
             $query->whereDate('finished_at', '>=', $request->date('date_from'));
         }
-
         if ($request->filled('date_to')) {
             $query->whereDate('finished_at', '<=', $request->date('date_to'));
         }
@@ -61,16 +55,13 @@ class PsychologistTestResultController extends Controller
         return response()->json($attempts);
     }
 
-    /**
-     * Детальный просмотр ответов по попытке.
-     */
     public function show(int $attemptId): JsonResponse
     {
         $attempt = TestAttempt::query()
             ->with([
                 'test:id,title',
                 'user:id,name,login',
-                'answers.question:id,text,type,options',
+                'answers.question:id,question_text,type,options,scale_min_label,scale_max_label',
             ])
             ->findOrFail($attemptId);
 
@@ -79,9 +70,11 @@ class PsychologistTestResultController extends Controller
                 'id' => $answer->id,
                 'question' => [
                     'id' => $answer->question->id,
-                    'text' => $answer->question->text,
+                    'text' => $answer->question->question_text,
                     'type' => $answer->question->type,
                     'options' => $answer->question->options,
+                    'scale_min_label' => $answer->question->scale_min_label,
+                    'scale_max_label' => $answer->question->scale_max_label,
                 ],
                 'answer' => $answer->value_json,
                 'answered_at' => $answer->created_at?->toIso8601String(),
@@ -112,22 +105,19 @@ class PsychologistTestResultController extends Controller
         ]);
     }
 
-    /**
-     * Сравнение текущей попытки с предыдущей попыткой того же теста у того же ребёнка.
-     */
     public function compare(int $attemptId): JsonResponse
     {
         $attempt = TestAttempt::query()
             ->with([
                 'test:id,title',
                 'user:id,name,login',
-                'answers.question:id,text,type,options',
+                'answers.question:id,question_text,type,options,scale_min_label,scale_max_label',
             ])
             ->findOrFail($attemptId);
 
         $previous = TestAttempt::query()
             ->with([
-                'answers.question:id,text,type,options',
+                'answers.question:id,question_text,type,options,scale_min_label,scale_max_label',
             ])
             ->where('user_id', $attempt->user_id)
             ->where('test_id', $attempt->test_id)
@@ -170,7 +160,7 @@ class PsychologistTestResultController extends Controller
             return [
                 'question' => [
                     'id' => $answer->question->id,
-                    'text' => $answer->question->text,
+                    'text' => $answer->question->question_text,
                     'type' => $answer->question->type,
                     'options' => $answer->question->options,
                 ],
@@ -201,9 +191,6 @@ class PsychologistTestResultController extends Controller
         ]);
     }
 
-    /**
-     * Обновление «суперсил» ребёнка (0–10 по каждому качеству).
-     */
     public function updateSuperpowers(Request $request, int $attemptId): JsonResponse
     {
         $attempt = TestAttempt::findOrFail($attemptId);
@@ -227,9 +214,6 @@ class PsychologistTestResultController extends Controller
         ]);
     }
 
-    /**
-     * Удаление попытки.
-     */
     public function destroy(int $attemptId): JsonResponse
     {
         $attempt = TestAttempt::findOrFail($attemptId);
@@ -247,17 +231,13 @@ class PsychologistTestResultController extends Controller
         return $payload;
     }
 
-
-        /**
-     * Экспорт попытки в PDF (ответы + суперсилы ребёнка).
-     */
     public function exportPdf(int $attemptId)
     {
         $attempt = TestAttempt::query()
             ->with([
                 'test:id,title',
                 'user:id,name,login',
-                'answers.question:id,text,type,options',
+                'answers.question:id,question_text,type,options,scale_min_label,scale_max_label',
             ])
             ->findOrFail($attemptId);
 
@@ -267,7 +247,7 @@ class PsychologistTestResultController extends Controller
 
         $answers = $attempt->answers->map(function (TestAnswer $answer) {
             return [
-                'question' => $answer->question->text,
+                'question' => $answer->question->question_text,
                 'type' => $answer->question->type,
                 'answer' => $this->formatAnswerValue($answer->value_json, $answer->question),
             ];
@@ -300,18 +280,31 @@ class PsychologistTestResultController extends Controller
 
     private function formatAnswerValue($value, $question): string
     {
-        if ($value === null || $value === undefined || $value === '') {
+        if ($value === null || $value === '') {
             return 'skipped';
         }
 
-        if ($question->type === 'single' && is_array($value) && array_key_exists('option_id', $value)) {
-            $options = is_array($question->options) ? $question->options : [];
-            foreach ($options as $option) {
-                if (is_array($option) && isset($option['id']) && (int) $option['id'] === (int) $value['option_id']) {
-                    return (string) ($option['text'] ?? ('Вариант #' . $value['option_id']));
+        if ($question->type === 'single') {
+            if (is_array($value)) {
+                if (isset($value['text']) && $value['text'] !== '') {
+                    return (string) $value['text'];
                 }
+
+                $options = is_array($question->options) ? $question->options : [];
+                $idx = $value['index'] ?? null;
+                $optionId = $value['option_id'] ?? null;
+
+                if ($idx !== null && isset($options[$idx]['text'])) {
+                    return (string) $options[$idx]['text'];
+                }
+
+                if ($optionId !== null && isset($options[$optionId - 1]['text'])) {
+                    return (string) $options[$optionId - 1]['text'];
+                }
+
+                return 'Вариант #' . ($optionId ?? '?');
             }
-            return 'Вариант #' . $value['option_id'];
+            return (string) $value;
         }
 
         if ($question->type === 'scale' && is_array($value) && array_key_exists('value', $value)) {

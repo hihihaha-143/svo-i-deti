@@ -135,27 +135,35 @@ export default function TestResultViewModal({
     const formatAnswer = (value: any, question: AnswerItem['question']): string => {
         if (value === null || value === undefined || value === '') return 'skipped';
 
-        if (question.type === 'single' && value && typeof value === 'object' && 'option_id' in value) {
-            const options = Array.isArray(question.options) ? question.options : [];
-            const found = options.find((o: any) => Number(o.id) === Number(value.option_id));
-            return found ? String(found.text) : `Вариант #${value.option_id}`;
+        if (question.type === 'single') {
+            if (typeof value === 'string') return value;
+            if (typeof value === 'object') {
+                if (typeof value.text === 'string' && value.text !== '') return value.text;
+
+                const options = Array.isArray(question.options) ? question.options : [];
+                const idx = value.index;
+                const optionId = value.option_id;
+
+                if (typeof idx === 'number' && options[idx]?.text) return options[idx].text;
+                if (typeof optionId === 'number' && options[optionId - 1]?.text) return options[optionId - 1].text;
+
+                return `Вариант #${optionId ?? '?'}`;
+            }
+            return String(value);
         }
 
-        if (question.type === 'scale' && value && typeof value === 'object' && 'value' in value) {
-            return String(value.value);
+        if (question.type === 'scale') {
+            if (typeof value === 'object' && 'value' in value) return String(value.value);
+            return String(value);
         }
 
-        if (question.type === 'luscher' && value && typeof value === 'object' && 'order' in value) {
-            return Array.isArray(value.order) ? value.order.join(' → ') : String(value.order);
-        }
-
-        if (typeof value === 'string') return value;
-        if (typeof value === 'number') return String(value);
-        if (Array.isArray(value)) return value.join(', ');
-        if (typeof value === 'object') {
-            if ('value' in value) return String(value.value);
+        if (question.type === 'luscher') {
+            if (typeof value === 'object' && 'order' in value && Array.isArray(value.order)) {
+                return value.order.join(' → ');
+            }
             return JSON.stringify(value);
         }
+
         return String(value);
     };
 
@@ -215,51 +223,53 @@ export default function TestResultViewModal({
                 <div className="users-table__loading">Загрузка...</div>
             ) : (
                 <div className="test-result-view">
-                    <table className="users-table">
-                        <thead>
-                            <tr>
-                                <th>Вопрос</th>
-                                <th>Ответ</th>
-                                <th>Дата</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {answers.length === 0 ? (
+                    <div className="test-result-view__answers">
+                        <table className="users-table__table">
+                            <thead>
                                 <tr>
-                                    <td colSpan={3}>Ответов нет</td>
+                                    <th>Вопрос</th>
+                                    <th className="test-result-view__col-answer">Ответ</th>
+                                    <th className="test-result-view__col-date">Дата</th>
                                 </tr>
-                            ) : (
-                                answers.map(a => (
-                                    <tr key={a.id}>
-                                        <td data-label="Вопрос">{a.question.text}</td>
-                                        <td data-label="Ответ">{formatAnswer(a.answer, a.question)}</td>
-                                        <td data-label="Дата">{formatDate(a.answered_at)}</td>
+                            </thead>
+                            <tbody>
+                                {answers.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={3}>Ответов нет</td>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
+                                ) : (
+                                    answers.map(a => (
+                                        <tr key={a.id}>
+                                            <td data-label="Вопрос">{a.question.text}</td>
+                                            <td data-label="Ответ">{formatAnswer(a.answer, a.question)}</td>
+                                            <td data-label="Дата" className="test-result-view__date">
+                                                {formatDate(a.answered_at)}
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
 
-                    <div className="users-header">
-                        <div className="users-header__actions">
-                            <button
-                                type="button"
-                                className="users-header__add-btn"
-                                onClick={() => setIsFormOpen(prev => !prev)}
-                            >
-                                <Award size={16} />
-                                {isFormOpen ? 'Скрыть оценку качества' : 'Поставить оценку качества'}
-                            </button>
-                            <button
-                                type="button"
-                                className="users-header__export-btn"
-                                onClick={handleExportPdf}
-                                disabled={isExporting}
-                            >
-                                <Download size={16} />
-                                {isExporting ? 'Формирование...' : 'Экспорт PDF'}
-                            </button>
-                        </div>
+                    <div className="test-result-view__actions">
+                        <button
+                            type="button"
+                            className="test-result-view__btn test-result-view__btn--primary"
+                            onClick={() => setIsFormOpen(prev => !prev)}
+                        >
+                            <Award size={16} />
+                            {isFormOpen ? 'Скрыть оценку качества' : 'Поставить оценку качества'}
+                        </button>
+                        <button
+                            type="button"
+                            className="test-result-view__btn test-result-view__btn--secondary"
+                            onClick={handleExportPdf}
+                            disabled={isExporting}
+                        >
+                            <Download size={16} />
+                            {isExporting ? 'Формирование...' : 'Экспорт PDF'}
+                        </button>
                     </div>
 
                     {isFormOpen && (
