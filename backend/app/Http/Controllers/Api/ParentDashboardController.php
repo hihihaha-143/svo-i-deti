@@ -205,4 +205,47 @@ class ParentDashboardController extends Controller
 
         return response()->json(['message' => 'Запись удалена']);
     }
+
+
+
+        public function materials(Request $request)
+    {
+        $parent = $this->getParent($request);
+        if (!$parent) {
+            return response()->json(['message' => 'Профиль родителя не найден'], 403);
+        }
+
+        $materials = \App\Models\ParentMaterial::where('is_published', true)
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(function ($m) {
+                return [
+                    'id' => $m->id,
+                    'title' => $m->title,
+                    'excerpt' => $m->preview ?? \Illuminate\Support\Str::limit(strip_tags($m->content), 200),
+                    'created_at' => $m->created_at->format('d.m.Y'),
+                ];
+            });
+
+        return response()->json(['data' => $materials]);
+    }
+
+    public function material(Request $request, $id)
+    {
+        $parent = $this->getParent($request);
+        if (!$parent) {
+            return response()->json(['message' => 'Профиль родителя не найден'], 403);
+        }
+
+        $material = \App\Models\ParentMaterial::where('is_published', true)->findOrFail($id);
+
+        return response()->json([
+            'data' => [
+                'id' => $material->id,
+                'title' => $material->title,
+                'content' => $material->content,
+                'created_at' => $material->created_at->format('d.m.Y'),
+            ],
+        ]);
+    }
 }

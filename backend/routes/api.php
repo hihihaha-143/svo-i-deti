@@ -138,5 +138,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/diaries', [ParentDashboardController::class, 'diaries']);
         Route::post('/diaries', [ParentDashboardController::class, 'storeDiary']);
         Route::delete('/diaries/{id}', [ParentDashboardController::class, 'destroyDiary']);
+
+                Route::get('/materials', [ParentDashboardController::class, 'materials']);
+        Route::get('/materials/{id}', [ParentDashboardController::class, 'material']);
+
+        
     });
 });

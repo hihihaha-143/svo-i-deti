@@ -7,6 +7,8 @@ import MentorDashboard from './pages/MentorDashboard/MentorDashboard';
 import ParentDashboard from './pages/ParentDashboard/ParentDashboard';
 import ParentHomePage from './pages/ParentDashboard/ParentHomePage';
 import ParentDiaryPage from './pages/ParentDashboard/ParentDiaryPage';
+import ParentLibraryPage from './pages/ParentDashboard/ParentLibraryPage';
+import ParentLibraryArticlePage from './pages/ParentDashboard/ParentLibraryArticlePage';
 
 // Временная заглушка для остальных ролей
 function RoleStub({ title }: { title: string }) {
@@ -40,7 +42,8 @@ function App() {
                         <Route path="/parent" element={<ParentDashboard />}>
                             <Route index element={<ParentHomePage />} />
                             <Route path="diary" element={<ParentDiaryPage />} />
-                            <Route path="library" element={<div>Библиотека знаний (в разработке)</div>} />
+                            <Route path="library" element={<ParentLibraryPage />} />
+                            <Route path="library/:id" element={<ParentLibraryArticlePage />} />
                             <Route path="chat" element={<div>Чат с психологом (в разработке)</div>} />
                         </Route>
                     </Route>
