@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Achievement;
 use App\Models\Child;
 use App\Models\ChildAchievement;
+use App\Models\ChildSuperpower;
 use App\Models\MoodEntry;
 use App\Models\Test;
 use App\Models\TestAttempt;
@@ -192,10 +193,104 @@ class ChildDashboardController extends Controller
         ]);
     }
 
+    public function stats(Request $request)
+    {
+        $child = $this->getChild($request);
+        if (!$child) {
+            return response()->json(['message' => 'Профиль ребёнка не найден'], 403);
+        }
+
+        // Проверяем достижения за суперсилы
+        $newlyEarnedIds = $this->checkAchievements($child);
+
+        // 1. Основные счётчики
+        $messagesSent = 0; // чата пока нет
+        $urgentMessages = 0; // чата пока нет
+        $testsPassed = TestAttempt::where('user_id', $child->user_id)
+            ->where('is_completed', true)
+            ->count();
+        $achievementsEarned = ChildAchievement::where('child_id', $child->id)->count();
+        $colorings = 0; // раскрасок пока нет
+        $starsTotal = (int) $child->stars;
+
+        // 2. Настроения
+        $moodCounts = MoodEntry::where('child_id', $child->id)
+            ->selectRaw('mood, COUNT(*) as cnt')
+            ->groupBy('mood')
+            ->pluck('cnt', 'mood');
+
+        $moodsTotal = MoodEntry::where('child_id', $child->id)->count();
+
+        // Дней подряд
+        $dates = MoodEntry::where('child_id', $child->id)
+            ->orderByDesc('date')
+            ->pluck('date')
+            ->map(fn($d) => \Carbon\Carbon::parse($d)->toDateString())
+            ->unique()
+            ->values()
+            ->toArray();
+
+        $streak = 0;
+        $checkDate = now()->toDateString();
+        foreach ($dates as $d) {
+            if ($d === $checkDate) {
+                $streak++;
+                $checkDate = \Carbon\Carbon::parse($d)->subDay()->toDateString();
+            } else {
+                break;
+            }
+        }
+
+        $lastMoodDate = $dates[0] ?? null;
+
+        // 3. Суперсилы
+        $superpowers = ChildSuperpower::where('child_id', $child->user_id)->first();
+        $qualities = [];
+        foreach (ChildSuperpower::QUALITIES as $key => $label) {
+            $qualities[] = [
+                'key' => $key,
+                'label' => $label,
+                'value' => $superpowers ? (int) $superpowers->{$key} : 0,
+                'max' => 10,
+            ];
+        }
+
+        return response()->json([
+            'data' => [
+                'messages_sent' => $messagesSent,
+                'urgent_messages' => $urgentMessages,
+                'tests_passed' => $testsPassed,
+                'achievements_earned' => $achievementsEarned,
+                'colorings' => $colorings,
+                'stars_total' => $starsTotal,
+                'moods' => [
+                    'good' => (int) ($moodCounts['good'] ?? 0),
+                    'normal' => (int) ($moodCounts['normal'] ?? 0),
+                    'bad' => (int) ($moodCounts['bad'] ?? 0),
+                    'total' => $moodsTotal,
+                    'streak' => $streak,
+                    'last_date' => $lastMoodDate,
+                ],
+                'superpowers' => $qualities,
+            ],
+            'newly_earned' => Achievement::whereIn('id', $newlyEarnedIds)
+                ->where('is_hidden', false)
+                ->get()
+                ->map(fn($a) => [
+                    'id' => $a->id,
+                    'title' => $a->title,
+                    'icon' => $a->icon,
+                    'stars_reward' => $a->stars_reward,
+                ]),
+            'stars' => (int) $child->fresh()->stars,
+        ]);
+    }
+
     private function checkAchievements(Child $child): array
     {
         $newlyEarned = [];
 
+        // 1. Достижения за длительность настроения
         $moodDays = MoodEntry::where('child_id', $child->id)
             ->distinct('date')
             ->count('date');
@@ -214,6 +309,7 @@ class ChildDashboardController extends Controller
             }
         }
 
+        // 2. Скрытые достижения за неделю конкретного настроения
         $last7 = MoodEntry::where('child_id', $child->id)
             ->whereDate('date', '>=', now()->subDays(6)->toDateString())
             ->orderBy('date')
@@ -232,6 +328,25 @@ class ChildDashboardController extends Controller
                     $id = $this->award($child, $map[$mood]);
                     if ($id !== null) $newlyEarned[] = $id;
                 }
+            }
+        }
+
+        // 3. Достижения за суперсилы на 10
+        $superpowers = ChildSuperpower::where('child_id', $child->user_id)->first();
+        if ($superpowers) {
+            $allMax = true;
+            foreach (array_keys(ChildSuperpower::QUALITIES) as $key) {
+                if ((int) $superpowers->{$key} >= 10) {
+                    $id = $this->award($child, 'superpower_max_' . $key);
+                    if ($id !== null) $newlyEarned[] = $id;
+                } else {
+                    $allMax = false;
+                }
+            }
+
+            if ($allMax) {
+                $id = $this->award($child, 'all_superpowers_max');
+                if ($id !== null) $newlyEarned[] = $id;
             }
         }
 

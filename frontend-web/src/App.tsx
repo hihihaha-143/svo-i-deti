@@ -13,6 +13,7 @@ import ParentTestPassingPage from './pages/ParentDashboard/ParentTestPassingPage
 import ChildDashboard from './pages/ChildDashboard/ChildDashboard';
 import ChildHomePage from './pages/ChildDashboard/ChildHomePage';
 import ChildAchievementsPage from './pages/ChildDashboard/ChildAchievementsPage';
+import ChildStatsPage from './pages/ChildDashboard/ChildStatsPage';
 
 function App() {
   return (
@@ -45,7 +46,7 @@ function App() {
             <Route path="/child" element={<ChildDashboard />}>
               <Route index element={<ChildHomePage />} />
               <Route path="achievements" element={<ChildAchievementsPage />} />
-              <Route path="stats" element={<div>Статистика (в разработке)</div>} />
+              <Route path="stats" element={<ChildStatsPage />} />
               <Route path="events" element={<div>Мероприятия (в разработке)</div>} />
               <Route path="memo" element={<div>Памятка (в разработке)</div>} />
               <Route path="test/:testId" element={<div>Прохождение теста (в разработке)</div>} />

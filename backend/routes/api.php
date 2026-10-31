@@ -155,5 +155,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/mood', [ChildDashboardController::class, 'storeMood']);
         Route::get('/achievements', [ChildDashboardController::class, 'achievements']);
         Route::post('/theme', [ChildDashboardController::class, 'changeTheme']);
+                Route::get('/stats', [ChildDashboardController::class, 'stats']);
     });
 });

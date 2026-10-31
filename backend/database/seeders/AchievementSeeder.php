@@ -45,6 +45,17 @@ class AchievementSeeder extends Seeder
             ['code' => 'week_good_mood',     'title' => 'Неделя хорошего настроения', 'icon' => 'smile',        'stars_reward' => 0,   'is_hidden' => true],
             ['code' => 'week_normal_mood',   'title' => 'Неделя нормального настроения','icon' => 'meh',        'stars_reward' => 0,   'is_hidden' => true],
             ['code' => 'week_bad_mood',      'title' => 'Неделя плохого настроения',  'icon' => 'frown',        'stars_reward' => 0,   'is_hidden' => true],
+
+            // Скрытые — за суперсилы на 10
+            ['code' => 'superpower_max_independence',   'title' => 'Максимум самостоятельности', 'icon' => 'zap', 'stars_reward' => 0, 'is_hidden' => true],
+            ['code' => 'superpower_max_emotional_sphere','title' => 'Максимум эмоциональной сферы','icon' => 'heart', 'stars_reward' => 0, 'is_hidden' => true],
+            ['code' => 'superpower_max_responsibility', 'title' => 'Максимум ответственности',   'icon' => 'shield', 'stars_reward' => 0, 'is_hidden' => true],
+            ['code' => 'superpower_max_creativity',     'title' => 'Максимум креативности',      'icon' => 'palette', 'stars_reward' => 0, 'is_hidden' => true],
+            ['code' => 'superpower_max_organization',   'title' => 'Максимум организованности',  'icon' => 'book', 'stars_reward' => 0, 'is_hidden' => true],
+            ['code' => 'superpower_max_sociability',    'title' => 'Максимум общительности',     'icon' => 'message', 'stars_reward' => 0, 'is_hidden' => true],
+            ['code' => 'superpower_max_social_activity','title' => 'Максимум социальной активности','icon' => 'users', 'stars_reward' => 0, 'is_hidden' => true],
+            ['code' => 'superpower_max_willpower',      'title' => 'Максимум силы воли',         'icon' => 'flame', 'stars_reward' => 0, 'is_hidden' => true],
+            ['code' => 'all_superpowers_max',           'title' => 'Все суперсилы на максимум',  'icon' => 'crown', 'stars_reward' => 0, 'is_hidden' => true],
         ];
 
         foreach ($achievements as $item) {
