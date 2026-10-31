@@ -17,6 +17,7 @@ import DailyTipsPage from '../DailyTipsPage/DailyTipsPage';
 import RecommendationsPage from '../RecommendationsPage/RecommendationsPage';
 import TestsPage from './TestsPage';
 import TestResultsPage from '../TestResultsPage/TestResultsPage';
+import ReportsPage from '../ReportsPage/ReportsPage';
 import { useAuth } from '../../contexts/AuthContext';
 import apiClient from '../../api/client';
 
@@ -32,11 +33,11 @@ interface DashboardData {
     online_mentors: number;
 }
 
-type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries' | 'events' | 'event-attendance' | 'chat-templates' | 'parent-materials' | 'daily-tips' | 'recommendations' | 'tests' | 'test-results';
+type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries' | 'events' | 'event-attendance' | 'chat-templates' | 'parent-materials' | 'daily-tips' | 'recommendations' | 'tests' | 'test-results' | 'reports';
 
 const STORAGE_KEY = 'psychologist_current_page';
 const VALID_PAGES: PageKey[] = [
-    'dashboard', 'users', 'login-logs', 'moods', 'diaries', 'events', 'event-attendance', 'chat-templates', 'parent-materials', 'daily-tips', 'recommendations', 'tests', 'test-results',
+    'dashboard', 'users', 'login-logs', 'moods', 'diaries', 'events', 'event-attendance', 'chat-templates', 'parent-materials', 'daily-tips', 'recommendations', 'tests', 'test-results', 'reports',
 ];
 
 function isValidPage(value: string | null): value is PageKey {
@@ -146,6 +147,7 @@ export default function PsychologistDashboard() {
         'recommendations': 'Рекомендации родителям',
         'tests': 'Список тестов',
         'test-results': 'Результаты тестов',
+        'reports': 'Отчётность',
     };
 
     const renderPage = () => {
@@ -173,21 +175,10 @@ export default function PsychologistDashboard() {
             );
         }
 
-        if (currentPage === 'users') {
-            return <UsersPage />;
-        }
-
-        if (currentPage === 'login-logs') {
-            return <LoginLogsPage />;
-        }
-
-        if (currentPage === 'moods') {
-            return <MoodPage />;
-        }
-
-        if (currentPage === 'diaries') {
-            return <DiaryPage />;
-        }
+        if (currentPage === 'users') return <UsersPage />;
+        if (currentPage === 'login-logs') return <LoginLogsPage />;
+        if (currentPage === 'moods') return <MoodPage />;
+        if (currentPage === 'diaries') return <DiaryPage />;
 
         if (currentPage === 'events') {
             return <EventPage onOpenAttendance={handleOpenAttendance} />;
@@ -202,29 +193,13 @@ export default function PsychologistDashboard() {
             );
         }
 
-        if (currentPage === 'chat-templates') {
-            return <ChatTemplatesPage />;
-        }
-
-        if (currentPage === 'parent-materials') {
-            return <ParentMaterialsPage />;
-        }
-
-        if (currentPage === 'daily-tips') {
-            return <DailyTipsPage />;
-        }
-
-        if (currentPage === 'recommendations') {
-            return <RecommendationsPage />;
-        }
-
-        if (currentPage === 'tests') {
-            return <TestsPage />;
-        }
-
-        if (currentPage === 'test-results') {
-            return <TestResultsPage />;
-        }
+        if (currentPage === 'chat-templates') return <ChatTemplatesPage />;
+        if (currentPage === 'parent-materials') return <ParentMaterialsPage />;
+        if (currentPage === 'daily-tips') return <DailyTipsPage />;
+        if (currentPage === 'recommendations') return <RecommendationsPage />;
+        if (currentPage === 'tests') return <TestsPage />;
+        if (currentPage === 'test-results') return <TestResultsPage />;
+        if (currentPage === 'reports') return <ReportsPage />;
 
         return null;
     };

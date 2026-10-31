@@ -19,6 +19,8 @@ use App\Http\Controllers\Api\MentorChildController;
 use App\Http\Controllers\Api\MentorMoodController;
 use App\Http\Controllers\Api\MentorEventController;
 use App\Http\Controllers\Api\PsychologistTestController;
+use App\Http\Controllers\Api\PsychologistReportController;
+
 
 
 
@@ -104,7 +106,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/psychologist/test-results/{attempt}', [PsychologistTestResultController::class, 'show']);
     Route::put('/psychologist/test-results/{attempt}/superpowers', [PsychologistTestResultController::class, 'updateSuperpowers']);
     Route::delete('/psychologist/test-results/{attempt}', [PsychologistTestResultController::class, 'destroy']);
-
+   
+        // Отчётность
+    Route::get('/psychologist/reports/children', [PsychologistReportController::class, 'children']);
+    Route::get('/psychologist/reports/children/export', [PsychologistReportController::class, 'childrenExport']);
+    Route::get('/psychologist/reports/children/{child}/export', [PsychologistReportController::class, 'childExport']);
+    Route::get('/psychologist/reports/children/{child}', [PsychologistReportController::class, 'child']);
     
     // Наставник
     Route::get('/mentor/dashboard', [MentorDashboardController::class, 'index']);

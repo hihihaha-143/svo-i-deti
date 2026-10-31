@@ -6,7 +6,7 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
-type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries' | 'events' | 'event-attendance' | 'chat-templates' | 'parent-materials' | 'daily-tips' | 'recommendations' | 'tests' | 'test-results';
+type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries' | 'events' | 'event-attendance' | 'chat-templates' | 'parent-materials' | 'daily-tips' | 'recommendations' | 'tests' | 'test-results' | 'reports';
 
 interface SidebarProps {
     onClose?: () => void;
@@ -58,7 +58,11 @@ export default function Sidebar({ onClose, onNavigate, currentPage }: SidebarPro
                     >
                         <DoorOpen size={20} /> Мониторинг входов
                     </a>
-                    <a href="#" className="sidebar__link">
+                    <a
+                        href="#"
+                        className={`sidebar__link ${currentPage === 'reports' ? 'sidebar__link--active' : ''}`}
+                        onClick={(e) => { e.preventDefault(); onNavigate?.('reports'); onClose?.(); }}
+                    >
                         <FileText size={20} /> Отчётность
                     </a>
                 </div>

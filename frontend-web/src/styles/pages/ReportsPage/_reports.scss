@@ -1,0 +1,37 @@
+.report-child {
+    .stats-cards {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.2rem;
+        margin-bottom: 1.2rem;
+
+        @media (max-width: 600px) {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .stats-cards__item {
+        padding: 1.2rem;
+    }
+
+    .stats-cards__value {
+        font-size: 2.4rem;
+    }
+}
+
+// Заголовок секции внутри модалки (не путать с PDF-классом)
+.report-section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-admin);
+    margin: 0.4rem 0 0.8rem;
+}
+
+// Внутри модалки у таблиц нет внешней обёртки .users-page, поэтому
+// добавляем аккуратную рамку только для таблиц в report-child.
+.report-child {
+    .users-table {
+        border: 1px solid var(--secondary-admin);
+        border-radius: var(--radius-2);
+        overflow-x: auto;
+    }
+}
