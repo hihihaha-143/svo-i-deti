@@ -56,9 +56,9 @@ export default function ChildHomePage() {
     () => localStorage.getItem(THEME_STORAGE_KEY) || 'mint'
   );
   const [newAchievements, setNewAchievements] = useState<NewAchievement[]>([]);
+  const [isMemoOpen, setIsMemoOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Применяем тему из localStorage сразу (до ответа сервера)
   useEffect(() => {
     const saved = localStorage.getItem(THEME_STORAGE_KEY);
     if (saved) {
@@ -78,7 +78,6 @@ export default function ChildHomePage() {
         setTodayMood(moodRes.data.data?.mood || null);
         setStarEarnedToday(moodRes.data.data?.star_earned || false);
 
-        // Синхронизация темы с сервером
         const serverTheme = testsRes.data.theme || 'mint';
         setCurrentTheme(serverTheme);
         document.documentElement.setAttribute('data-theme', serverTheme);
@@ -160,7 +159,7 @@ export default function ChildHomePage() {
           <Calendar size={24} />
           <span>Мои мероприятия</span>
         </button>
-        <button className="child-home__menu-btn" onClick={() => navigate('/child/memo')}>
+        <button className="child-home__menu-btn" onClick={() => setIsMemoOpen(true)}>
           <BookOpen size={24} />
           <span>Памятка</span>
         </button>
@@ -271,6 +270,55 @@ export default function ChildHomePage() {
             onClick={() => setNewAchievements([])}
           >
             Отлично!
+          </button>
+        </div>
+      </Modal>
+
+          <Modal
+        isOpen={isMemoOpen}
+        onClose={() => setIsMemoOpen(false)}
+        title="Памятка"
+      >
+        <div className="child-home__memo">
+          <p className="child-home__memo-intro">
+            Правила чата с психологом и наставниками
+          </p>
+
+          <ol className="child-home__memo-list">
+            <li className="child-home__memo-item">
+              <strong>Кому и зачем можно писать.</strong> Психологу — если хочешь обсудить свои переживания, тревоги, отношения с друзьями или семьёй, учебные трудности или что-то, что тебя волнует. Наставнику — по вопросам учёбы, расписания, участия в кружках, выполнения заданий или просто, если нужен совет по школьным делам, выбору будущей профессии. Пожалуйста, не пиши наставникам о личных психологических проблемах — для этого есть психолог. А психологу не задавай вопросы по расписанию и оценкам — это к наставнику.
+            </li>
+            <li className="child-home__memo-item">
+              <strong>Уважай себя и других.</strong> Пожалуйста, общайся вежливо и не используй грубые слова — мы здесь, чтобы помогать друг другу.
+            </li>
+            <li className="child-home__memo-item">
+              <strong>Конфиденциальность — это святое.</strong> Всё, что ты пишешь психологу, никто не увидит: ни классный руководитель, ни директор, ни родители (если только ты сам не захочешь им рассказать). Наставники видят только те сообщения, которые относятся к учёбе и посещениям; они не имеют доступа к твоему диалогу с психологом.
+            </li>
+            <li className="child-home__memo-item">
+              <strong>Ответственность психолога и наставников.</strong> Психолог отвечает в течение 24 часов в будние дни. Наставник отвечает по учебным вопросам обычно в течение рабочего дня. Если нужна срочная помощь — нажми кнопку «Срочное сообщение». Психолог получит уведомление и свяжется с тобой как можно скорее.
+            </li>
+            <li className="child-home__memo-item">
+              <strong>Когда нам важно знать.</strong> Если тебе очень плохо, ты думаешь о причинении вреда себе или другим — обязательно сообщи об этом психологу. Это не для наказания, а чтобы помочь тебе и сохранить твоё здоровье. Мы обязательно поговорим с тобой и предложим помощь.
+            </li>
+            <li className="child-home__memo-item">
+              <strong>Твоё право остановить общение.</strong> Ты можешь завершить диалог в любой момент. Если не хочешь общаться — просто не пиши. Никто не заставляет.
+            </li>
+            <li className="child-home__memo-item">
+              <strong>Технические правила.</strong> Не передавай свой логин и пароль никому — это твой личный кабинет. Даже если родители или друзья просят.
+            </li>
+            <li className="child-home__memo-item">
+              <strong>Если что-то пошло не так.</strong> Если тебе кажется, что психолог или наставник нарушил эти правила (например, был груб или разгласил тайну), ты можешь написать жалобу на почту: <a href="mailto:kovtunova.o.m.2@mail.ru">kovtunova.o.m.2@mail.ru</a> — ответ придёт, и мы разберёмся.
+            </li>
+            <li className="child-home__memo-item">
+              <strong>Главное.</strong> Мы здесь, чтобы помогать, а не шпионить. Этот чат — твоё безопасное пространство.
+            </li>
+          </ol>
+
+          <button
+            className="child-home__memo-close-btn"
+            onClick={() => setIsMemoOpen(false)}
+          >
+            Понятно
           </button>
         </div>
       </Modal>
