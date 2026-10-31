@@ -14,6 +14,8 @@ class Child extends Model
         'psychologist_id',
         'mentor_id',
         'parent_id',
+        'stars',
+        'theme',
     ];
 
     public function user()

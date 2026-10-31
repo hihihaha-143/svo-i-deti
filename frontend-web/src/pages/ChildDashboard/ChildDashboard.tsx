@@ -5,10 +5,10 @@ import '../../styles/pages/ChildDashboard/_child-dashboard.scss';
 
 const pageTitles: Record<string, string> = {
   '/child': '',
-  '/child/achievements': 'Мои достижения',
-  '/child/stats': 'Моя статистика',
-  '/child/events': 'Мои мероприятия',
-  '/child/memo': 'Памятка',
+  '/child/achievements': '',
+  '/child/stats': '',
+  '/child/events': '',
+  '/child/memo': '',
 };
 
 export default function ChildDashboard() {

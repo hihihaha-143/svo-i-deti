@@ -41,6 +41,8 @@ const MOODS = [
   { id: 'bad', label: 'Грустно', Icon: Frown },
 ];
 
+const THEME_STORAGE_KEY = 'child_theme';
+
 export default function ChildHomePage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -50,9 +52,19 @@ export default function ChildHomePage() {
   const [stars, setStars] = useState<number>(0);
   const [todayMood, setTodayMood] = useState<string | null>(null);
   const [starEarnedToday, setStarEarnedToday] = useState<boolean>(false);
-  const [currentTheme, setCurrentTheme] = useState<string>('mint');
+  const [currentTheme, setCurrentTheme] = useState<string>(
+    () => localStorage.getItem(THEME_STORAGE_KEY) || 'mint'
+  );
   const [newAchievements, setNewAchievements] = useState<NewAchievement[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Применяем тему из localStorage сразу (до ответа сервера)
+  useEffect(() => {
+    const saved = localStorage.getItem(THEME_STORAGE_KEY);
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,6 +77,12 @@ export default function ChildHomePage() {
         setStars(testsRes.data.stars || 0);
         setTodayMood(moodRes.data.data?.mood || null);
         setStarEarnedToday(moodRes.data.data?.star_earned || false);
+
+        // Синхронизация темы с сервером
+        const serverTheme = testsRes.data.theme || 'mint';
+        setCurrentTheme(serverTheme);
+        document.documentElement.setAttribute('data-theme', serverTheme);
+        localStorage.setItem(THEME_STORAGE_KEY, serverTheme);
       } catch {
         showToast('Ошибка загрузки данных', 'error');
       } finally {
@@ -93,6 +111,7 @@ export default function ChildHomePage() {
   const handleThemeSelect = async (themeId: string) => {
     setCurrentTheme(themeId);
     document.documentElement.setAttribute('data-theme', themeId);
+    localStorage.setItem(THEME_STORAGE_KEY, themeId);
 
     try {
       const res = await apiClient.post('/child/theme', { theme: themeId });
