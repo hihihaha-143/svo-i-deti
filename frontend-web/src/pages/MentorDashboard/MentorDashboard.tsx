@@ -8,6 +8,7 @@ import MentorChildrenPage from './MentorChildrenPage';
 import MentorMoodPage from './MentorMoodPage';
 import MentorEventPage from './MentorEventPage';
 import MentorEventAttendancePage from './MentorEventAttendancePage';
+import MentorTestResultsPage from './MentorTestResultsPage';
 import { useAuth } from '../../contexts/AuthContext';
 import apiClient from '../../api/client';
 
@@ -190,7 +191,7 @@ export default function MentorDashboard() {
         }
 
         if (currentPage === 'test-results') {
-            return <PageStub title="Результаты тестов" />;
+            return <MentorTestResultsPage />;
         }
 
         return null;

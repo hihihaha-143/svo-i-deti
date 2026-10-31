@@ -20,6 +20,8 @@ use App\Http\Controllers\Api\MentorMoodController;
 use App\Http\Controllers\Api\MentorEventController;
 use App\Http\Controllers\Api\PsychologistTestController;
 use App\Http\Controllers\Api\PsychologistReportController;
+use App\Http\Controllers\Api\Mentor\MentorTestResultController;
+
 
 
 
@@ -112,7 +114,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/psychologist/reports/children/export', [PsychologistReportController::class, 'childrenExport']);
     Route::get('/psychologist/reports/children/{child}/export', [PsychologistReportController::class, 'childExport']);
     Route::get('/psychologist/reports/children/{child}', [PsychologistReportController::class, 'child']);
-    
+
     // Наставник
     Route::get('/mentor/dashboard', [MentorDashboardController::class, 'index']);
 
@@ -126,5 +128,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/mentor/events', [MentorEventController::class, 'store']);
     Route::put('/mentor/events/{id}', [MentorEventController::class, 'update']);
     Route::delete('/mentor/events/{id}', [MentorEventController::class, 'destroy']);
+
+    Route::get('/mentor/test-results', [MentorTestResultController::class, 'index']);
 
 });
