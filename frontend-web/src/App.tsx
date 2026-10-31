@@ -4,6 +4,8 @@ import LoginPage from './pages/LoginPage/LoginPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import PsychologistDashboard from './pages/PsychologistDashboard/PsychologistDashboard';
 import MentorDashboard from './pages/MentorDashboard/MentorDashboard';
+import ParentDashboard from './pages/ParentDashboard/ParentDashboard';
+import ParentHomePage from './pages/ParentDashboard/ParentHomePage';
 
 // Временная заглушка для остальных ролей
 function RoleStub({ title }: { title: string }) {
@@ -32,9 +34,17 @@ function App() {
                     <Route element={<ProtectedRoute allowedRole="mentor" />}>
                         <Route path="/mentor" element={<MentorDashboard />} />
                     </Route>
+
                     <Route element={<ProtectedRoute allowedRole="parent" />}>
-                        <Route path="/parent" element={<RoleStub title="Дашборд Родителя" />} />
+                        <Route path="/parent" element={<ParentDashboard />}>
+                            <Route index element={<ParentHomePage />} />
+                            {/* Заглушки для будущих страниц родителя */}
+                            <Route path="diary" element={<div>Дневник наблюдений (в разработке)</div>} />
+                            <Route path="library" element={<div>Библиотека знаний (в разработке)</div>} />
+                            <Route path="chat" element={<div>Чат с психологом (в разработке)</div>} />
+                        </Route>
                     </Route>
+
                     <Route element={<ProtectedRoute allowedRole="child" />}>
                         <Route path="/child" element={<RoleStub title="Дашборд Ребенка" />} />
                     </Route>

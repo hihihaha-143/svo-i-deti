@@ -21,10 +21,7 @@ use App\Http\Controllers\Api\MentorEventController;
 use App\Http\Controllers\Api\PsychologistTestController;
 use App\Http\Controllers\Api\PsychologistReportController;
 use App\Http\Controllers\Api\Mentor\MentorTestResultController;
-
-
-
-
+use App\Http\Controllers\Api\ParentDashboardController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -131,4 +128,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/mentor/test-results', [MentorTestResultController::class, 'index']);
 
+    // Родитель
+    Route::prefix('parent')->group(function () {
+        Route::get('/children', [ParentDashboardController::class, 'children']);
+        Route::get('/recommendations', [ParentDashboardController::class, 'recommendations']);
+        Route::get('/tests', [ParentDashboardController::class, 'tests']);
+        Route::get('/daily-tip', [ParentDashboardController::class, 'dailyTip']);
+    });
 });
