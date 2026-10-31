@@ -8,6 +8,7 @@ import {
 import apiClient from '../../api/client';
 import { useAuth } from '../../contexts/AuthContext';
 import useToast from '../../hooks/useToast';
+import Modal from '../../components/Modal/Modal';
 import mintTheme from '../../assets/themes/mint.png';
 import oceanTheme from '../../assets/themes/ocean.png';
 import duckTheme from '../../assets/themes/duck.png';
@@ -18,6 +19,13 @@ interface Test {
   id: number;
   title: string;
   is_passed: boolean;
+}
+
+interface NewAchievement {
+  id: number;
+  title: string;
+  icon: string | null;
+  stars_reward: number;
 }
 
 const THEMES = [
@@ -40,8 +48,10 @@ export default function ChildHomePage() {
 
   const [tests, setTests] = useState<Test[]>([]);
   const [stars, setStars] = useState<number>(0);
-  const [selectedMood, setSelectedMood] = useState<string | null>(null);
+  const [todayMood, setTodayMood] = useState<string | null>(null);
+  const [starEarnedToday, setStarEarnedToday] = useState<boolean>(false);
   const [currentTheme, setCurrentTheme] = useState<string>('mint');
+  const [newAchievements, setNewAchievements] = useState<NewAchievement[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -53,7 +63,8 @@ export default function ChildHomePage() {
         ]);
         setTests(testsRes.data.data || []);
         setStars(testsRes.data.stars || 0);
-        setSelectedMood(moodRes.data.data?.mood || null);
+        setTodayMood(moodRes.data.data?.mood || null);
+        setStarEarnedToday(moodRes.data.data?.star_earned || false);
       } catch {
         showToast('Ошибка загрузки данных', 'error');
       } finally {
@@ -64,23 +75,34 @@ export default function ChildHomePage() {
   }, []);
 
   const handleMoodSelect = async (mood: string) => {
-    if (selectedMood) {
-      showToast('Настроение уже отмечено сегодня', 'error');
-      return;
-    }
     try {
-      await apiClient.post('/child/mood', { mood });
-      setSelectedMood(mood);
-      setStars((prev) => prev + 1);
-      showToast('Настроение сохранено! +1 звезда', 'success');
+      const res = await apiClient.post('/child/mood', { mood });
+      setTodayMood(mood);
+      setStars(res.data.stars);
+      if (res.data.star_earned) {
+        setStarEarnedToday(true);
+        showToast('Настроение сохранено! +1 звезда', 'success');
+      } else {
+        showToast('Настроение обновлено', 'success');
+      }
     } catch {
       showToast('Ошибка сохранения настроения', 'error');
     }
   };
 
-  const handleThemeSelect = (themeId: string) => {
+  const handleThemeSelect = async (themeId: string) => {
     setCurrentTheme(themeId);
     document.documentElement.setAttribute('data-theme', themeId);
+
+    try {
+      const res = await apiClient.post('/child/theme', { theme: themeId });
+      setStars(res.data.stars);
+      if (res.data.newly_earned?.length > 0) {
+        setNewAchievements(res.data.newly_earned);
+      }
+    } catch {
+      // тихо игнорируем
+    }
   };
 
   const handleTakeTest = (testId: number) => {
@@ -96,7 +118,6 @@ export default function ChildHomePage() {
 
   return (
     <div className="child-home">
-      {/* Приветствие + звёзды */}
       <div className="child-home__greeting">
         <h1 className="child-home__greeting-text">
           Привет, {user?.name}!
@@ -107,7 +128,6 @@ export default function ChildHomePage() {
         </div>
       </div>
 
-      {/* Меню */}
       <div className="child-home__menu">
         <button className="child-home__menu-btn" onClick={() => navigate('/child/achievements')}>
           <Trophy size={24} />
@@ -127,34 +147,38 @@ export default function ChildHomePage() {
         </button>
       </div>
 
-      {/* Настроение */}
       <div className="child-home__section child-home__section--mood">
         <div className="child-home__section-title">
           <Heart size={20} />
           <span>Моё настроение</span>
         </div>
         <div className="child-home__moods">
-          {MOODS.map(({ id, label, Icon }) => (
-            <button
-              key={id}
-              className={`child-home__mood-btn${selectedMood === id ? ' child-home__mood-btn--selected' : ''}`}
-              onClick={() => handleMoodSelect(id)}
-              disabled={!!selectedMood}
-            >
-              <Icon size={20} />
-              <span>{label}</span>
-            </button>
-          ))}
+          {MOODS.map(({ id, label, Icon }) => {
+            const isSelected = todayMood === id;
+            return (
+              <button
+                key={id}
+                className={`child-home__mood-btn${isSelected ? ' child-home__mood-btn--selected' : ''}`}
+                onClick={() => handleMoodSelect(id)}
+              >
+                <Icon size={20} />
+                <span>{label}</span>
+              </button>
+            );
+          })}
         </div>
+        {starEarnedToday && (
+          <p className="child-home__mood-note">
+            Звезда за настроение сегодня уже получена
+          </p>
+        )}
       </div>
 
-      {/* Обратиться за помощью */}
       <button className="child-home__help-btn" onClick={() => showToast('Чат появится позже', 'info')}>
         <MessageCircle size={20} />
         <span>Обратиться за помощью</span>
       </button>
 
-      {/* Мои задания */}
       <div className="child-home__section">
         <div className="child-home__section-title">
           <ListTodo size={20} />
@@ -184,7 +208,6 @@ export default function ChildHomePage() {
         )}
       </div>
 
-      {/* Выбери тему */}
       <div className="child-home__section child-home__section--themes">
         <div className="child-home__section-title">
           <span>Выбери тему</span>
@@ -203,11 +226,35 @@ export default function ChildHomePage() {
         </div>
       </div>
 
-      {/* Выйти */}
       <button className="child-home__logout-btn" onClick={handleLogout}>
         <LogOut size={20} />
         <span>Выйти</span>
       </button>
+
+      <Modal
+        isOpen={newAchievements.length > 0}
+        onClose={() => setNewAchievements([])}
+        title="Новое достижение!"
+      >
+        <div className="child-home__achievement-modal">
+          {newAchievements.map((ach) => (
+            <div key={ach.id} className="child-home__achievement-item">
+              <p className="child-home__achievement-title">{ach.title}</p>
+              {ach.stars_reward > 0 && (
+                <p className="child-home__achievement-stars">
+                  <Star size={16} fill="currentColor" /> +{ach.stars_reward} звёзд
+                </p>
+              )}
+            </div>
+          ))}
+          <button
+            className="child-home__achievement-btn"
+            onClick={() => setNewAchievements([])}
+          >
+            Отлично!
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }

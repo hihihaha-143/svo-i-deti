@@ -1,0 +1,16 @@
+.site-footer {
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+  border-top: 1px solid #eee;
+
+  &__project {
+    margin: 0 0 8px;
+  }
+
+  &__copyright {
+    margin: 0;
+    font-size: 13px;
+    color: #999;
+  }
+}

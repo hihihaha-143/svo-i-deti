@@ -8,6 +8,12 @@ body {
     font-size: 1.6rem;
     line-height: 1.5;
     background: var(--bg);
-    min-height: 100vh;
     color: var(--text);
+    // min-height: 100vh; ← убрали
+}
+
+#root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }

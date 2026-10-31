@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\PsychologistTestController;
 use App\Http\Controllers\Api\PsychologistReportController;
 use App\Http\Controllers\Api\Mentor\MentorTestResultController;
 use App\Http\Controllers\Api\ParentDashboardController;
+use App\Http\Controllers\Api\ChildDashboardController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -87,7 +88,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/psychologist/recommendations/{recommendation}', [PsychologistRecommendationController::class, 'destroy']);
     Route::post('/psychologist/recommendations/{recommendation}/mark-unread', [PsychologistRecommendationController::class, 'markAsUnread']);
 
-
     // Тесты
     Route::get('/psychologist/tests', [PsychologistTestController::class, 'index']);
     Route::get('/psychologist/tests/{id}', [PsychologistTestController::class, 'show']);
@@ -96,7 +96,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/psychologist/tests/{id}', [PsychologistTestController::class, 'destroy']);
     Route::post('/psychologist/tests/upload-coloring', [PsychologistTestController::class, 'uploadColoring']);
   
-     // Результаты тестов
+    // Результаты тестов
     Route::get('/psychologist/test-results', [PsychologistTestResultController::class, 'index']);
     Route::get('/psychologist/test-results/{attempt}/compare', [PsychologistTestResultController::class, 'compare']);
     Route::get('/psychologist/test-results/{attempt}/export', [PsychologistTestResultController::class, 'exportPdf']);
@@ -106,7 +106,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/psychologist/test-results/{attempt}/superpowers', [PsychologistTestResultController::class, 'updateSuperpowers']);
     Route::delete('/psychologist/test-results/{attempt}', [PsychologistTestResultController::class, 'destroy']);
    
-        // Отчётность
+    // Отчётность
     Route::get('/psychologist/reports/children', [PsychologistReportController::class, 'children']);
     Route::get('/psychologist/reports/children/export', [PsychologistReportController::class, 'childrenExport']);
     Route::get('/psychologist/reports/children/{child}/export', [PsychologistReportController::class, 'childExport']);
@@ -128,7 +128,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/mentor/test-results', [MentorTestResultController::class, 'index']);
 
-      // Родитель
+    // Родитель
     Route::prefix('parent')->group(function () {
         Route::get('/children', [ParentDashboardController::class, 'children']);
         Route::get('/recommendations', [ParentDashboardController::class, 'recommendations']);
@@ -139,14 +139,21 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/diaries', [ParentDashboardController::class, 'storeDiary']);
         Route::delete('/diaries/{id}', [ParentDashboardController::class, 'destroyDiary']);
 
-                Route::get('/materials', [ParentDashboardController::class, 'materials']);
+        Route::get('/materials', [ParentDashboardController::class, 'materials']);
         Route::get('/materials/{id}', [ParentDashboardController::class, 'material']);
         Route::post('/recommendations/{id}/read', [ParentDashboardController::class, 'markRecommendationRead']);
 
         Route::post('/tests/{testId}/start', [ParentDashboardController::class, 'startTest']);
         Route::post('/tests/{testId}/answer', [ParentDashboardController::class, 'answerTest']);
         Route::post('/tests/{testId}/finish', [ParentDashboardController::class, 'finishTest']);
+    });
 
-
+    // Ребёнок
+    Route::prefix('child')->group(function () {
+        Route::get('/tests', [ChildDashboardController::class, 'tests']);
+        Route::get('/mood/today', [ChildDashboardController::class, 'todayMood']);
+        Route::post('/mood', [ChildDashboardController::class, 'storeMood']);
+        Route::get('/achievements', [ChildDashboardController::class, 'achievements']);
+        Route::post('/theme', [ChildDashboardController::class, 'changeTheme']);
     });
 });
