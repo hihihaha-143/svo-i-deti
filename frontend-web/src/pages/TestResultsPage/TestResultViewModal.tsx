@@ -8,6 +8,7 @@ import {
     Handshake,
     Heart,
     MessageCircle,
+    RotateCcw,
     Users,
     Zap,
 } from 'lucide-react';
@@ -36,6 +37,10 @@ interface Superpowers {
     sociability: number;
     social_activity: number;
     willpower: number;
+}
+
+interface RetakeInfo {
+    allowed_at: string;
 }
 
 interface TestResultViewModalProps {
@@ -97,12 +102,16 @@ export default function TestResultViewModal({
     const [isSaving, setIsSaving] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
 
+    const [retake, setRetake] = useState<RetakeInfo | null>(null);
+    const [isAllowing, setIsAllowing] = useState(false);
+
     useEffect(() => {
         if (!isOpen || attemptId === null) return;
 
         setIsLoading(true);
         setIsFormOpen(false);
         setSuperpowers(DEFAULT_SUPERPOWERS);
+        setRetake(null);
 
         apiClient.get(`/psychologist/test-results/${attemptId}`)
             .then(res => {
@@ -116,6 +125,7 @@ export default function TestResultViewModal({
                 if (data.superpowers) {
                     setSuperpowers(data.superpowers);
                 }
+                setRetake(data.retake ?? null);
             })
             .catch(() => showToast('Не удалось загрузить ответы', 'error'))
             .finally(() => setIsLoading(false));
@@ -185,6 +195,21 @@ export default function TestResultViewModal({
             showToast(e.response?.data?.message || 'Ошибка сохранения', 'error');
         } finally {
             setIsSaving(false);
+        }
+    };
+
+    const handleAllowRetake = async () => {
+        if (attemptId === null) return;
+
+        setIsAllowing(true);
+        try {
+            const res = await apiClient.post(`/psychologist/test-results/${attemptId}/allow-retake`);
+            setRetake({ allowed_at: res.data.retake.allowed_at });
+            showToast('Повторное прохождение разрешено', 'success');
+        } catch (e: any) {
+            showToast(e.response?.data?.message || 'Не удалось разрешить повторное прохождение', 'error');
+        } finally {
+            setIsAllowing(false);
         }
     };
 
@@ -269,6 +294,16 @@ export default function TestResultViewModal({
                         >
                             <Download size={16} />
                             {isExporting ? 'Формирование...' : 'Экспорт PDF'}
+                        </button>
+                        <button
+                            type="button"
+                            className={`test-result-view__btn ${retake ? 'test-result-view__btn--allowed' : 'test-result-view__btn--accent'}`}
+                            onClick={handleAllowRetake}
+                            disabled={isAllowing || !!retake}
+                            title={retake ? `Разрешено ${formatDate(retake.allowed_at)}` : 'Разрешить пройти тест ещё раз'}
+                        >
+                            <RotateCcw size={16} />
+                            {retake ? 'Повторное прохождение разрешено' : (isAllowing ? 'Разрешение...' : 'Разрешить пройти ещё раз')}
                         </button>
                     </div>
 

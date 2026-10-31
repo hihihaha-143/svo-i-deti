@@ -325,4 +325,63 @@ class PsychologistTestResultController extends Controller
 
         return json_encode($value, JSON_UNESCAPED_UNICODE);
     }
+
+        /**
+     * Разрешить ребёнку пройти тест ещё раз.
+     */
+    public function allowRetake(int $attemptId): JsonResponse
+    {
+        $attempt = TestAttempt::findOrFail($attemptId);
+
+        $retake = \App\Models\TestRetake::updateOrCreate(
+            [
+                'child_id' => $attempt->user_id,
+                'test_id' => $attempt->test_id,
+            ],
+            [
+                'allowed_at' => now(),
+            ]
+        );
+
+        return response()->json([
+            'message' => 'Повторное прохождение разрешено',
+            'retake' => [
+                'id' => $retake->id,
+                'child_id' => $retake->child_id,
+                'test_id' => $retake->test_id,
+                'allowed_at' => $retake->allowed_at?->toIso8601String(),
+            ],
+        ]);
+    }
+
+    /**
+     * Проверка статуса «можно ли ребёнку пройти тест ещё раз».
+     */
+    public function retakeStatus(int $attemptId): JsonResponse
+    {
+        $attempt = TestAttempt::findOrFail($attemptId);
+
+        $retake = \App\Models\TestRetake::query()
+            ->where('child_id', $attempt->user_id)
+            ->where('test_id', $attempt->test_id)
+            ->first();
+
+        $alreadyPassed = TestAttempt::query()
+            ->where('user_id', $attempt->user_id)
+            ->where('test_id', $attempt->test_id)
+            ->where('is_completed', true)
+            ->exists();
+
+        $isAllowed = !$alreadyPassed || ($retake !== null);
+
+        return response()->json([
+            'attempt_id' => $attempt->id,
+            'child_id' => $attempt->user_id,
+            'test_id' => $attempt->test_id,
+            'already_passed' => $alreadyPassed,
+            'retake_allowed' => $retake !== null,
+            'allowed_at' => $retake?->allowed_at?->toIso8601String(),
+            'can_pass_now' => $isAllowed,
+        ]);
+    }
 }

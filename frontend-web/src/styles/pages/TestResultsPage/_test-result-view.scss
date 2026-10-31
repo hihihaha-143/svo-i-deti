@@ -66,5 +66,14 @@
             background: var(--bg-admin);
             border: 1px solid var(--primary-admin);
         }
-    }
+    }        &--accent {
+            color: #ffffff;
+            background: var(--accent-admin);
+        }
+
+        &--allowed {
+            color: var(--right);
+            background: var(--bg-admin);
+            border: 1px solid var(--right);
+        }
 }
