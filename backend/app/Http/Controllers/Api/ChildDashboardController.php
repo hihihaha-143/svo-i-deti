@@ -7,6 +7,8 @@ use App\Models\Achievement;
 use App\Models\Child;
 use App\Models\ChildAchievement;
 use App\Models\ChildSuperpower;
+use App\Models\Event;
+use App\Models\EventAttendance;
 use App\Models\MoodEntry;
 use App\Models\Test;
 use App\Models\TestAttempt;
@@ -282,6 +284,91 @@ class ChildDashboardController extends Controller
                 ]),
             'stars' => (int) $child->fresh()->stars,
         ]);
+    }
+       public function events(Request $request)
+    {
+        $child = $this->getChild($request);
+        if (!$child) {
+            return response()->json(['message' => 'Профиль ребёнка не найден'], 403);
+        }
+
+        $events = Event::whereHas('children', function ($q) use ($child) {
+            $q->where('children.id', $child->id);
+        })
+            ->with(['lessons' => function ($q) {
+                $q->orderBy('lesson_number');
+            }])
+            ->orderByDesc('start_date')
+            ->get();
+
+        $childId = $child->id;
+        $today = now()->toDateString();
+
+        $items = $events->map(function ($event) use ($childId, $today) {
+            $totalLessons = $event->lessons->count();
+            $attendedLessons = EventAttendance::whereIn('event_lesson_id', $event->lessons->pluck('id'))
+                ->where('child_id', $childId)
+                ->where('attended', true)
+                ->count();
+
+            $attendanceMap = EventAttendance::whereIn('event_lesson_id', $event->lessons->pluck('id'))
+                ->where('child_id', $childId)
+                ->get()
+                ->keyBy('event_lesson_id');
+
+            $nextLesson = $event->lessons
+                ->filter(fn($l) => $l->lesson_date->toDateString() >= $today)
+                ->sortBy('lesson_date')
+                ->first();
+
+            $lastPastLesson = $event->lessons
+                ->filter(fn($l) => $l->lesson_date->toDateString() < $today)
+                ->sortByDesc('lesson_date')
+                ->first();
+
+            $lastAttendance = null;
+            if ($lastPastLesson) {
+                $att = $attendanceMap->get($lastPastLesson->id);
+                $lastAttendance = $att ? (bool) $att->attended : null;
+            }
+
+            $missedLessons = $event->lessons
+                ->filter(function ($l) use ($today, $attendanceMap) {
+                    if ($l->lesson_date->toDateString() >= $today) return false;
+                    $att = $attendanceMap->get($l->id);
+                    return $att && $att->attended === false;
+                })
+                ->map(fn($l) => [
+                    'lesson_number' => $l->lesson_number,
+                    'date' => $l->lesson_date->format('d.m.Y'),
+                ])
+                ->values();
+
+            return [
+                'id' => $event->id,
+                'title' => $event->title,
+                'type' => $event->type,
+                'description' => $event->description,
+                'start_date' => $event->start_date?->format('d.m.Y'),
+                'lessons_count' => $totalLessons,
+                'attended_count' => $attendedLessons,
+                'schedule_type' => $event->schedule_type,
+                'schedule_interval' => $event->schedule_interval,
+                'schedule_day_of_week' => $event->schedule_day_of_week,
+                'next_lesson' => $nextLesson ? [
+                    'date' => $nextLesson->lesson_date->format('d.m.Y'),
+                    'lesson_number' => $nextLesson->lesson_number,
+                ] : null,
+                'last_lesson' => $lastPastLesson ? [
+                    'date' => $lastPastLesson->lesson_date->format('d.m.Y'),
+                    'lesson_number' => $lastPastLesson->lesson_number,
+                    'attended' => $lastAttendance,
+                ] : null,
+                'missed_lessons' => $missedLessons,
+            ];
+        });
+
+        return response()->json(['data' => $items]);
     }
 
     private function checkAchievements(Child $child): array
