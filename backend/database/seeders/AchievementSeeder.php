@@ -10,14 +10,15 @@ class AchievementSeeder extends Seeder
     public function run(): void
     {
         $achievements = [
-            // Из макета (23)
+            // Из макета (видимые)
             ['code' => 'taste_refined',      'title' => 'Утончённый вкус',           'icon' => 'palette',      'stars_reward' => 0,   'is_hidden' => false],
             ['code' => 'first_message',      'title' => 'Первое сообщение',           'icon' => 'message',      'stars_reward' => 0,   'is_hidden' => false],
             ['code' => 'honest_child',       'title' => 'Самый честный ребёнок',      'icon' => 'shield',       'stars_reward' => 0,   'is_hidden' => false],
             ['code' => 'color_magic',        'title' => 'Магия цвета',                'icon' => 'rainbow',      'stars_reward' => 0,   'is_hidden' => false],
             ['code' => 'mood_week',          'title' => 'Неделя настроения',          'icon' => 'flame',        'stars_reward' => 7,   'is_hidden' => false],
             ['code' => 'mood_month',         'title' => 'Месяц настроения',           'icon' => 'star',         'stars_reward' => 30,  'is_hidden' => false],
-            ['code' => 'mood_master',        'title' => 'Мастер настроения',          'icon' => 'crown',        'stars_reward' => 100, 'is_hidden' => false],
+            ['code' => 'mood_90_days',       'title' => '3 месяца настроения',        'icon' => 'calendar',     'stars_reward' => 90,  'is_hidden' => false],
+            ['code' => 'mood_year',          'title' => 'Год настроения',             'icon' => 'calendar',     'stars_reward' => 350, 'is_hidden' => false],
             ['code' => 'beginner',           'title' => 'Начинающий',                 'icon' => 'pencil',       'stars_reward' => 10,  'is_hidden' => false],
             ['code' => 'researcher',         'title' => 'Исследователь',              'icon' => 'search',       'stars_reward' => 20,  'is_hidden' => false],
             ['code' => 'expert',             'title' => 'Эксперт',                    'icon' => 'book',         'stars_reward' => 30,  'is_hidden' => false],
@@ -33,12 +34,6 @@ class AchievementSeeder extends Seeder
             ['code' => 'social_activity',    'title' => 'Социальная активность',      'icon' => 'trophy',       'stars_reward' => 0,   'is_hidden' => false],
             ['code' => 'willpower',          'title' => 'Сила воли',                  'icon' => 'trophy',       'stars_reward' => 0,   'is_hidden' => false],
             ['code' => 'quiet_test',         'title' => 'Тихий тест',                 'icon' => 'hat',          'stars_reward' => 0,   'is_hidden' => false],
-
-            // Новые — за длительность настроения
-            ['code' => 'mood_90_days',       'title' => '3 месяца настроения',        'icon' => 'calendar',     'stars_reward' => 90,  'is_hidden' => false],
-            ['code' => 'mood_year',          'title' => 'Год настроения',             'icon' => 'calendar',     'stars_reward' => 350, 'is_hidden' => false],
-
-            // Первая смена темы
             ['code' => 'first_theme_change', 'title' => 'Первая смена темы',          'icon' => 'palette',      'stars_reward' => 5,   'is_hidden' => false],
 
             // Скрытые — за неделю конкретного настроения
@@ -56,7 +51,22 @@ class AchievementSeeder extends Seeder
             ['code' => 'superpower_max_social_activity','title' => 'Максимум социальной активности','icon' => 'users', 'stars_reward' => 0, 'is_hidden' => true],
             ['code' => 'superpower_max_willpower',      'title' => 'Максимум силы воли',         'icon' => 'flame', 'stars_reward' => 0, 'is_hidden' => true],
             ['code' => 'all_superpowers_max',           'title' => 'Все суперсилы на максимум',  'icon' => 'crown', 'stars_reward' => 0, 'is_hidden' => true],
-        ];
+
+            // Скрытые — за тесты
+            ['code' => 'first_test',         'title' => 'Первый тест',                  'icon' => 'pencil',       'stars_reward' => 0,   'is_hidden' => true],
+            ['code' => 'all_tests_done',     'title' => 'Все тесты пройдены',           'icon' => 'trophy',       'stars_reward' => 0,   'is_hidden' => true],
+            ['code' => 'no_skips_test',      'title' => 'Тест без пропусков',           'icon' => 'check',        'stars_reward' => 0,   'is_hidden' => true],
+            ['code' => 'luscher_test',       'title' => 'Люшер пройден',                'icon' => 'rainbow',      'stars_reward' => 0,   'is_hidden' => true],
+            ['code' => 'perfect_score_test', 'title' => 'Идеальный счёт',               'icon' => 'star',         'stars_reward' => 0,   'is_hidden' => true],
+                   // За раскраски
+            ['code' => 'coloring_1',  'title' => 'Художник',       'icon' => 'brush',   'stars_reward' => 3,  'is_hidden' => false],
+            ['code' => 'coloring_3',  'title' => 'Юный художник',  'icon' => 'palette', 'stars_reward' => 5,  'is_hidden' => false],
+            ['code' => 'coloring_6',  'title' => 'Мастер кисти',   'icon' => 'image',   'stars_reward' => 10, 'is_hidden' => false],
+            ['code' => 'coloring_9',  'title' => 'Пикассо',        'icon' => 'trophy',  'stars_reward' => 15, 'is_hidden' => false],
+            ['code' => 'coloring_10', 'title' => 'Легенда кисти',  'icon' => 'crown',   'stars_reward' => 0,  'is_hidden' => false],
+            
+            ];
+        
 
         foreach ($achievements as $item) {
             Achievement::updateOrCreate(

@@ -157,7 +157,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/theme', [ChildDashboardController::class, 'changeTheme']);
                 Route::get('/stats', [ChildDashboardController::class, 'stats']);
         Route::get('/events', [ChildDashboardController::class, 'events']);
-        
-        
+                Route::post('/tests/{testId}/start', [ChildDashboardController::class, 'startTest']);
+        Route::post('/tests/{testId}/answer', [ChildDashboardController::class, 'answerTest']);
+        Route::post('/tests/{testId}/finish', [ChildDashboardController::class, 'finishTest']);
+                Route::get('/colorings', [ChildDashboardController::class, 'colorings']);
+        Route::post('/colorings/{key}/use', [ChildDashboardController::class, 'useColoring']);
+
+
         });
 });

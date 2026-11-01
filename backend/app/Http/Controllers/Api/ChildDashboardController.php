@@ -11,7 +11,9 @@ use App\Models\Event;
 use App\Models\EventAttendance;
 use App\Models\MoodEntry;
 use App\Models\Test;
+use App\Models\TestAnswer;
 use App\Models\TestAttempt;
+use App\Models\TestRetake;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -50,6 +52,202 @@ class ChildDashboardController extends Controller
             'stars' => (int) $child->stars,
             'theme' => $child->theme ?: 'mint',
         ]);
+    }
+
+    public function startTest(Request $request, $testId)
+    {
+        $child = $this->getChild($request);
+        if (!$child) {
+            return response()->json(['message' => 'Профиль ребёнка не найден'], 403);
+        }
+
+        $test = Test::where('is_active', true)
+            ->whereIn('for_whom', ['child', 'both'])
+            ->with('questions')
+            ->findOrFail($testId);
+
+        $completedAttempt = TestAttempt::where('test_id', $test->id)
+            ->where('user_id', $child->user_id)
+            ->where('is_completed', true)
+            ->first();
+
+        if ($completedAttempt) {
+            $retake = TestRetake::where('child_id', $child->id)
+                ->where('test_id', $test->id)
+                ->first();
+
+            if (!$retake) {
+                return response()->json(['message' => 'Тест уже пройден'], 409);
+            }
+        }
+
+        $attempt = TestAttempt::where('test_id', $test->id)
+            ->where('user_id', $child->user_id)
+            ->where('is_completed', false)
+            ->first();
+
+        if (!$attempt) {
+            $attempt = TestAttempt::create([
+                'test_id' => $test->id,
+                'user_id' => $child->user_id,
+                'is_completed' => false,
+            ]);
+        }
+
+        $luscherColors = [
+            ['value' => 'blue', 'text' => 'Синий', 'hex' => '#1E63B5'],
+            ['value' => 'green', 'text' => 'Зелёный', 'hex' => '#1E7A3C'],
+            ['value' => 'red', 'text' => 'Красный', 'hex' => '#C0392B'],
+            ['value' => 'yellow', 'text' => 'Жёлтый', 'hex' => '#F1C40F'],
+            ['value' => 'purple', 'text' => 'Фиолетовый', 'hex' => '#7D3C98'],
+            ['value' => 'brown', 'text' => 'Коричневый', 'hex' => '#795548'],
+            ['value' => 'black', 'text' => 'Чёрный', 'hex' => '#1C1C1C'],
+            ['value' => 'gray', 'text' => 'Серый', 'hex' => '#9E9E9E'],
+        ];
+
+        return response()->json([
+            'data' => [
+                'attempt_id' => $attempt->id,
+                'test' => [
+                    'id' => $test->id,
+                    'title' => $test->title,
+                    'description' => $test->description,
+                    'motivation_text' => $test->motivation_text,
+                    'coloring_file_url' => $test->coloring_file ? \Storage::url($test->coloring_file) : null,
+                    'questions' => $test->questions->map(function ($q) use ($luscherColors) {
+                        $options = $q->options;
+                        if ($q->type === 'luscher') {
+                            $options = $luscherColors;
+                        }
+                        return [
+                            'id' => $q->id,
+                            'question_text' => $q->question_text,
+                            'type' => $q->type,
+                            'order' => $q->order,
+                            'options' => $options,
+                            'scale_min_label' => $q->scale_min_label,
+                            'scale_max_label' => $q->scale_max_label,
+                            'allow_skip' => $q->allow_skip,
+                        ];
+                    })->sortBy('order')->values(),
+                ],
+            ],
+        ]);
+    }
+
+    public function answerTest(Request $request, $testId)
+    {
+        $child = $this->getChild($request);
+        if (!$child) {
+            return response()->json(['message' => 'Профиль ребёнка не найден'], 403);
+        }
+
+        $validated = $request->validate([
+            'attempt_id' => ['required', 'integer'],
+            'question_id' => ['required', 'integer'],
+            'value_json' => ['required'],
+        ]);
+
+        $attempt = TestAttempt::where('id', $validated['attempt_id'])
+            ->where('test_id', $testId)
+            ->where('user_id', $child->user_id)
+            ->where('is_completed', false)
+            ->firstOrFail();
+
+        TestAnswer::updateOrCreate(
+            [
+                'attempt_id' => $attempt->id,
+                'question_id' => $validated['question_id'],
+            ],
+            [
+                'value_json' => $validated['value_json'],
+            ]
+        );
+
+        return response()->json(['message' => 'Ответ сохранён']);
+    }
+
+    public function finishTest(Request $request, $testId)
+    {
+        $child = $this->getChild($request);
+        if (!$child) {
+            return response()->json(['message' => 'Профиль ребёнка не найден'], 403);
+        }
+
+        $validated = $request->validate([
+            'attempt_id' => ['required', 'integer'],
+        ]);
+
+        $attempt = TestAttempt::where('id', $validated['attempt_id'])
+            ->where('test_id', $testId)
+            ->where('user_id', $child->user_id)
+            ->where('is_completed', false)
+            ->firstOrFail();
+
+        $score = TestAnswer::where('attempt_id', $attempt->id)->count();
+
+        DB::transaction(function () use ($attempt, $child, $score) {
+            $attempt->update([
+                'is_completed' => true,
+                'finished_at' => now(),
+                'score' => $score,
+            ]);
+
+            $child->increment('stars', 3);
+
+            TestRetake::where('child_id', $child->id)
+                ->where('test_id', $attempt->test_id)
+                ->delete();
+        });
+
+        $newlyEarnedIds = $this->checkAchievements($child);
+
+        $test = Test::find($testId);
+
+        $newlyEarned = Achievement::whereIn('id', $newlyEarnedIds)
+            ->where('is_hidden', false)
+            ->get()
+            ->map(function ($ach) {
+                return [
+                    'id' => $ach->id,
+                    'title' => $ach->title,
+                    'icon' => $ach->icon,
+                    'stars_reward' => $ach->stars_reward,
+                ];
+            });
+
+        return response()->json([
+            'message' => 'Тест завершён',
+            'data' => [
+                'attempt_id' => $attempt->id,
+                'motivation_text' => $test?->motivation_text ?? 'Молодец, что прошёл тест!',
+                'stars_earned' => 3,
+                'stars_total' => (int) $child->fresh()->stars,
+                'newly_earned' => $newlyEarned,
+            ],
+        ]);
+    }
+
+    public function colorings(Request $request)
+    {
+        $child = $this->getChild($request);
+        if (!$child) {
+            return response()->json(['message' => 'Профиль ребёнка не найден'], 403);
+        }
+
+        $colorings = Test::where('is_active', true)
+            ->whereIn('for_whom', ['child', 'both'])
+            ->whereNotNull('coloring_file')
+            ->get()
+            ->map(function ($test) {
+                return [
+                    'id' => $test->id,
+                    'title' => $test->title,
+                    'url' => \Storage::url($test->coloring_file),
+                ];
+            });
+
+        return response()->json(['data' => $colorings]);
     }
 
     public function todayMood(Request $request)
@@ -198,7 +396,7 @@ class ChildDashboardController extends Controller
         ]);
     }
 
-    public function stats(Request $request)
+      public function stats(Request $request)
     {
         $child = $this->getChild($request);
         if (!$child) {
@@ -213,7 +411,7 @@ class ChildDashboardController extends Controller
             ->where('is_completed', true)
             ->count();
         $achievementsEarned = ChildAchievement::where('child_id', $child->id)->count();
-        $colorings = 0;
+        $colorings = \App\Models\ChildColoring::where('child_id', $child->id)->count();
         $starsTotal = (int) $child->stars;
 
         $moodCounts = MoodEntry::where('child_id', $child->id)
@@ -285,7 +483,8 @@ class ChildDashboardController extends Controller
             'stars' => (int) $child->fresh()->stars,
         ]);
     }
-       public function events(Request $request)
+
+    public function events(Request $request)
     {
         $child = $this->getChild($request);
         if (!$child) {
@@ -375,6 +574,7 @@ class ChildDashboardController extends Controller
     {
         $newlyEarned = [];
 
+        // 1. Настроение: длительность
         $moodDays = MoodEntry::where('child_id', $child->id)
             ->distinct('date')
             ->count('date');
@@ -393,6 +593,7 @@ class ChildDashboardController extends Controller
             }
         }
 
+        // 2. Настроение: неделя одинакового
         $last7 = MoodEntry::where('child_id', $child->id)
             ->whereDate('date', '>=', now()->subDays(6)->toDateString())
             ->orderBy('date')
@@ -414,6 +615,7 @@ class ChildDashboardController extends Controller
             }
         }
 
+        // 3. Суперсилы на 10
         $superpowers = ChildSuperpower::where('child_id', $child->user_id)->first();
         if ($superpowers) {
             $allMax = true;
@@ -428,6 +630,93 @@ class ChildDashboardController extends Controller
 
             if ($allMax) {
                 $id = $this->award($child, 'all_superpowers_max');
+                if ($id !== null) $newlyEarned[] = $id;
+            }
+        }
+
+        // 4. Количество пройденных тестов
+        $completedTests = TestAttempt::where('user_id', $child->user_id)
+            ->where('is_completed', true)
+            ->get();
+
+        $testsCount = $completedTests->count();
+
+        $testMilestones = [
+            'beginner'    => 1,
+            'researcher'  => 3,
+            'expert'      => 5,
+            'professor'   => 8,
+            'magistr'     => 10,
+            'doctor'      => 15,
+            'academician' => 20,
+            'legend'      => 30,
+        ];
+
+        foreach ($testMilestones as $code => $threshold) {
+            if ($testsCount >= $threshold) {
+                $id = $this->award($child, $code);
+                if ($id !== null) $newlyEarned[] = $id;
+            }
+        }
+
+        // 5. Скрытые за тесты
+        if ($testsCount > 0) {
+            $id = $this->award($child, 'first_test');
+            if ($id !== null) $newlyEarned[] = $id;
+        }
+
+
+                // 6. Раскраски
+        $coloringsCount = \App\Models\ChildColoring::where('child_id', $child->id)->count();
+
+        $coloringMilestones = [
+            'coloring_1'  => 1,
+            'coloring_3'  => 3,
+            'coloring_6'  => 6,
+            'coloring_9'  => 9,
+            'coloring_10' => 10,
+        ];
+
+        foreach ($coloringMilestones as $code => $threshold) {
+            if ($coloringsCount >= $threshold) {
+                $id = $this->award($child, $code);
+                if ($id !== null) $newlyEarned[] = $id;
+            }
+        }
+
+        $availableTestsCount = Test::where('is_active', true)
+            ->whereIn('for_whom', ['child', 'both'])
+            ->count();
+
+        if ($availableTestsCount > 0 && $completedTests->pluck('test_id')->unique()->count() >= $availableTestsCount) {
+            $id = $this->award($child, 'all_tests_done');
+            if ($id !== null) $newlyEarned[] = $id;
+        }
+
+        foreach ($completedTests as $attempt) {
+            $test = Test::find($attempt->test_id);
+            if (!$test) continue;
+
+            $totalQuestions = $test->questions()->count();
+            $answersCount = TestAnswer::where('attempt_id', $attempt->id)->count();
+
+            if ($totalQuestions > 0 && $answersCount >= $totalQuestions) {
+                $id = $this->award($child, 'perfect_score_test');
+                if ($id !== null) $newlyEarned[] = $id;
+
+                $hasSkipped = TestAnswer::where('attempt_id', $attempt->id)
+                    ->whereNull('value_json')
+                    ->exists();
+
+                if (!$hasSkipped) {
+                    $id = $this->award($child, 'no_skips_test');
+                    if ($id !== null) $newlyEarned[] = $id;
+                }
+            }
+
+            $hasLuscher = $test->questions()->where('type', 'luscher')->exists();
+            if ($hasLuscher) {
+                $id = $this->award($child, 'luscher_test');
                 if ($id !== null) $newlyEarned[] = $id;
             }
         }
@@ -459,5 +748,63 @@ class ChildDashboardController extends Controller
         });
 
         return $achievement->id;
+    }
+
+           public function useColoring(Request $request, $key)
+    {
+        $child = $this->getChild($request);
+        if (!$child) {
+            return response()->json(['message' => 'Профиль ребёнка не найден'], 403);
+        }
+
+        \App\Models\ChildColoring::firstOrCreate([
+            'child_id' => $child->id,
+            'coloring_key' => (string) $key,
+        ]);
+
+        $newlyEarnedIds = $this->checkColoringAchievements($child);
+
+        $newlyEarned = Achievement::whereIn('id', $newlyEarnedIds)
+            ->where('is_hidden', false)
+            ->get()
+            ->map(function ($ach) {
+                return [
+                    'id' => $ach->id,
+                    'title' => $ach->title,
+                    'icon' => $ach->icon,
+                    'stars_reward' => $ach->stars_reward,
+                ];
+            });
+
+        return response()->json([
+            'message' => 'Раскраска учтена',
+            'newly_earned' => $newlyEarned,
+            'stars' => (int) $child->fresh()->stars,
+        ]);
+    }
+
+
+        private function checkColoringAchievements(Child $child): array
+    {
+        $newlyEarned = [];
+
+        $coloringsCount = \App\Models\ChildColoring::where('child_id', $child->id)->count();
+
+        $coloringMilestones = [
+            'coloring_1'  => 1,
+            'coloring_3'  => 3,
+            'coloring_6'  => 6,
+            'coloring_9'  => 9,
+            'coloring_10' => 10,
+        ];
+
+        foreach ($coloringMilestones as $code => $threshold) {
+            if ($coloringsCount >= $threshold) {
+                $id = $this->award($child, $code);
+                if ($id !== null) $newlyEarned[] = $id;
+            }
+        }
+
+        return $newlyEarned;
     }
 }
