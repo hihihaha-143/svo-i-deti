@@ -1,0 +1,101 @@
+.chat-list-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    width: 100%;
+    padding: var(--space-2);
+    border: none;
+    border-bottom: 1px solid var(--secondary-admin);
+    background-color: transparent;
+    text-align: left;
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+        background-color: var(--bg-admin);
+    }
+
+    &--active {
+        background-color: var(--bg-admin);
+        border-left: 3px solid var(--primary-par);
+        padding-left: calc(var(--space-2) - 3px);
+    }
+
+    &--urgent {
+        background-color: #fff8e8;
+    }
+
+    &--urgent.chat-list-item--active {
+        background-color: #fff0d0;
+    }
+
+    &__top {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: var(--space-1);
+    }
+
+    &__name {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: var(--text-par);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__time {
+        font-size: 1.1rem;
+        color: var(--text-par);
+        opacity: 0.6;
+        flex-shrink: 0;
+    }
+
+    &__bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--space-1);
+    }
+
+    &__preview {
+        font-size: 1.2rem;
+        color: var(--text-par);
+        opacity: 0.7;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        flex: 1;
+    }
+
+    &__unread {
+        min-width: 2rem;
+        height: 2rem;
+        padding: 0 0.6rem;
+        border-radius: 1rem;
+        background-color: var(--primary-par);
+        color: var(--bg);
+        font-size: 1.1rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    &__urgent-badge {
+        position: absolute;
+        top: 0.6rem;
+        right: 0.6rem;
+        padding: 0.2rem 0.6rem;
+        border-radius: var(--radius-1);
+        background-color: var(--clarify);
+        color: var(--bg);
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+}

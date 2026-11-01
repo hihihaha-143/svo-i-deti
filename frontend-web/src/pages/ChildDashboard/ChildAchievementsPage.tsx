@@ -92,10 +92,6 @@ export default function ChildAchievementsPage() {
         <span>Назад</span>
       </button>
 
-      <h1 className="child-achievements__title">
-        <Trophy size={28} />
-        Мои достижения
-      </h1>
 
       <p className="child-achievements__counter">
         <Star size={16} fill="currentColor" />

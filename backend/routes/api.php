@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ChatTemplateCategoryController;
 use App\Http\Controllers\Api\ChatTemplateController;
+use App\Http\Controllers\Api\ConversationController;
 use App\Http\Controllers\Api\MentorDashboardController;
 use App\Http\Controllers\Api\PsychologistDashboardController;
 use App\Http\Controllers\Api\PsychologistDailyTipController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Api\PsychologistParentMaterialController;
 use App\Http\Controllers\Api\PsychologistRecommendationController;
 use App\Http\Controllers\Api\PsychologistTestResultController;
 use App\Http\Controllers\Api\PsychologistUserController;
+use App\Http\Controllers\Api\UrgentNotificationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\MentorChildController;
 use App\Http\Controllers\Api\MentorMoodController;
@@ -95,7 +97,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/psychologist/tests/{id}', [PsychologistTestController::class, 'update']);
     Route::delete('/psychologist/tests/{id}', [PsychologistTestController::class, 'destroy']);
     Route::post('/psychologist/tests/upload-coloring', [PsychologistTestController::class, 'uploadColoring']);
-  
+
     // Результаты тестов
     Route::get('/psychologist/test-results', [PsychologistTestResultController::class, 'index']);
     Route::get('/psychologist/test-results/{attempt}/compare', [PsychologistTestResultController::class, 'compare']);
@@ -105,7 +107,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/psychologist/test-results/{attempt}', [PsychologistTestResultController::class, 'show']);
     Route::put('/psychologist/test-results/{attempt}/superpowers', [PsychologistTestResultController::class, 'updateSuperpowers']);
     Route::delete('/psychologist/test-results/{attempt}', [PsychologistTestResultController::class, 'destroy']);
-   
+
     // Отчётность
     Route::get('/psychologist/reports/children', [PsychologistReportController::class, 'children']);
     Route::get('/psychologist/reports/children/export', [PsychologistReportController::class, 'childrenExport']);
@@ -155,14 +157,24 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/mood', [ChildDashboardController::class, 'storeMood']);
         Route::get('/achievements', [ChildDashboardController::class, 'achievements']);
         Route::post('/theme', [ChildDashboardController::class, 'changeTheme']);
-                Route::get('/stats', [ChildDashboardController::class, 'stats']);
+        Route::get('/stats', [ChildDashboardController::class, 'stats']);
         Route::get('/events', [ChildDashboardController::class, 'events']);
-                Route::post('/tests/{testId}/start', [ChildDashboardController::class, 'startTest']);
+        Route::post('/tests/{testId}/start', [ChildDashboardController::class, 'startTest']);
         Route::post('/tests/{testId}/answer', [ChildDashboardController::class, 'answerTest']);
         Route::post('/tests/{testId}/finish', [ChildDashboardController::class, 'finishTest']);
-                Route::get('/colorings', [ChildDashboardController::class, 'colorings']);
+        Route::get('/colorings', [ChildDashboardController::class, 'colorings']);
         Route::post('/colorings/{key}/use', [ChildDashboardController::class, 'useColoring']);
+    });
 
+    // Чат
+    Route::get('/conversations', [ConversationController::class, 'index']);
+    Route::post('/conversations', [ConversationController::class, 'store']);
+    Route::get('/conversations/{conversation}/messages', [ConversationController::class, 'messages']);
+    Route::post('/conversations/{conversation}/messages', [ConversationController::class, 'sendMessage']);
+    Route::post('/conversations/{conversation}/read', [ConversationController::class, 'markRead']);
 
-        });
+    // Срочные уведомления (психолог)
+    Route::get('/urgent-notifications', [UrgentNotificationController::class, 'index']);
+    Route::get('/urgent-notifications/count', [UrgentNotificationController::class, 'count']);
+    Route::post('/urgent-notifications/{urgentNotification}/acknowledge', [UrgentNotificationController::class, 'acknowledge']);
 });

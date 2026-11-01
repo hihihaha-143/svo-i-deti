@@ -64,10 +64,7 @@ export default function ChildEventsPage() {
         <span>Назад</span>
       </button>
 
-      <h1 className="child-events__title">
-        <Calendar size={28} />
-        Мои мероприятия
-      </h1>
+   
 
       {events.length === 0 ? (
         <p className="child-events__empty">Пока нет мероприятий</p>

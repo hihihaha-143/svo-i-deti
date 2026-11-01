@@ -1,0 +1,16 @@
+.chat-list {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    background-color: var(--bg);
+    border-right: 1px solid var(--secondary-admin);
+
+    &--loading,
+    &--empty {
+        padding: var(--space-2);
+        text-align: center;
+        color: var(--text-par);
+        opacity: 0.6;
+        font-size: 1.3rem;
+    }
+}

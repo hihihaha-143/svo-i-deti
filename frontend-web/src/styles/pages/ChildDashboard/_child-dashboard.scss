@@ -1,14 +1,42 @@
 @import '../../variables';
 
 .child-dashboard {
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background-color: var(--bg);
   display: flex;
   flex-direction: column;
 
   &__header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: var(--space-1) var(--space-2);
     text-align: center;
+    min-height: 5rem;
+    flex-shrink: 0;
+  }
+
+  &__back-btn {
+    position: absolute;
+    left: var(--space-2);
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: var(--secondary-admin);
+    }
   }
 
   &__title {
@@ -20,9 +48,33 @@
 
   &__main {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow-y: auto;
     padding: var(--space-2);
     max-width: 60rem;
     margin: 0 auto;
     width: 100%;
+
+    /* Скрываем скроллбар, но оставляем скролл */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge (старые) */
+    
+    &::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
+    }
+
+    @media (max-width: 768px) {
+      padding: 0;
+      max-width: 100%;
+    }
   }
+}
+
+/* Когда открыт чат — отключаем скролл у main, чтобы работал только внутренний скролл сообщений */
+.child-dashboard__main:has(.child-chat__wrapper) {
+    overflow: hidden;
+    padding: 0;
+    max-width: 100%;
 }

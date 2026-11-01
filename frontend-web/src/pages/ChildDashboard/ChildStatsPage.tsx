@@ -87,10 +87,7 @@ export default function ChildStatsPage() {
         <span>Назад</span>
       </button>
 
-      <h1 className="child-stats__title">
-        <BarChart3 size={28} />
-        Моя статистика
-      </h1>
+
 
       {/* Основные счётчики */}
       <div className="child-stats__grid">

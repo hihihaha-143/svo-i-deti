@@ -1,0 +1,74 @@
+.message-bubble {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    max-width: 80%;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-2) var(--radius-2) var(--radius-2) 0.4rem; /* Скошенный левый нижний угол для чужих */
+    background-color: var(--bg-admin);
+    color: var(--text-par);
+    font-size: 1.4rem;
+    line-height: 1.4;
+    word-break: break-word;
+    align-self: flex-start;
+
+    &--own {
+        align-self: flex-end;
+        background-color: var(--primary-par);
+        color: var(--bg);
+        border-radius: var(--radius-2) var(--radius-2) 0.4rem var(--radius-2); /* Скошенный правый нижний для своих */
+    }
+
+    &--urgent {
+        border: 2px solid var(--clarify);
+        background-color: #fff8e8;
+        color: var(--text-par);
+    }
+
+    &--flagged {
+        border: 2px solid var(--wrong);
+        background-color: #fdecec;
+        color: var(--text-par);
+    }
+
+    &--own.message-bubble--urgent {
+        background-color: var(--clarify);
+        color: var(--bg);
+    }
+
+    &__body {
+        white-space: pre-wrap;
+    }
+
+    &__meta {
+        display: flex;
+        align-items: center;
+        gap: var(--space-1);
+        margin-top: 0.4rem;
+        font-size: 1.1rem;
+        opacity: 0.8;
+    }
+
+    &__badge {
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 0.2rem 0.6rem;
+        border-radius: var(--radius-1);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+
+        &--urgent {
+            background-color: var(--clarify);
+            color: var(--bg);
+        }
+
+        &--flag {
+            background-color: var(--wrong);
+            color: var(--bg);
+        }
+    }
+
+    &__time {
+        margin-left: auto;
+    }
+}

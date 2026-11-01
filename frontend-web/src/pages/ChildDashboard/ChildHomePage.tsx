@@ -192,7 +192,7 @@ export default function ChildHomePage() {
         )}
       </div>
 
-      <button className="child-home__help-btn" onClick={() => showToast('Чат появится позже', 'info')}>
+      <button className="child-home__help-btn" onClick={() => navigate('/child/chat')}>
         <MessageCircle size={20} />
         <span>Обратиться за помощью</span>
       </button>
@@ -274,7 +274,7 @@ export default function ChildHomePage() {
         </div>
       </Modal>
 
-          <Modal
+      <Modal
         isOpen={isMemoOpen}
         onClose={() => setIsMemoOpen(false)}
         title="Памятка"

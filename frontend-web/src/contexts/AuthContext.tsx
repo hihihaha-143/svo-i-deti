@@ -14,6 +14,8 @@ interface Profile {
     psychologist_id?: number;
     mentor_id?: number;
     parent_id?: number;
+    psychologist_name?: string | null;
+    mentor_name?: string | null;
 }
 
 interface AuthContextType {
@@ -65,11 +67,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         checkAuth();
 
-        // Синхронизация между вкладками
         const handleStorage = (e: StorageEvent) => {
             if (e.key !== TOKEN_KEY) return;
             if (e.newValue === null) {
-                // Токен удалён в другой вкладке — разлогиниваемся
                 setUser(null);
                 setProfile(null);
             }
@@ -85,7 +85,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     const logout = () => {
-        // best-effort: удаляем токен на бэкенде, не блокируя UI
         apiClient.post('/logout').catch(() => {});
 
         clearToken();

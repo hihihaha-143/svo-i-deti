@@ -1,7 +1,8 @@
-@import 'child-dashboard';
-@import 'child-home';
-@import 'child-achievements';
-@import 'child-stats';
-@import 'child-events';
-@import 'child-test-passing';
-@import 'child-coloring';
+@use 'child-achievements';
+@use 'child-coloring';
+@use 'child-dashboard';
+@use 'child-events';
+@use 'child-home';
+@use 'child-stats';
+@use 'child-test-passing';
+@use 'child-chat';
