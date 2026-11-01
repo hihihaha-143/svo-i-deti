@@ -162,12 +162,13 @@
   }
 
   &__task {
-    @include chunky-button(var(--bg), var(--secondary));
+    @include chunky-button(var(--bg), var(--accent));
 
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.2rem 1.6rem;
+    padding: 1.2rem 1.6rem; border: 0.2rem solid var(--accent);
+
     border-radius: var(--radius-2);
     gap: var(--space-1);
   }

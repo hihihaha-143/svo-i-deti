@@ -15,6 +15,8 @@ import ChildHomePage from './pages/ChildDashboard/ChildHomePage';
 import ChildAchievementsPage from './pages/ChildDashboard/ChildAchievementsPage';
 import ChildStatsPage from './pages/ChildDashboard/ChildStatsPage';
 import ChildEventsPage from './pages/ChildDashboard/ChildEventsPage';
+import ChildTestPassingPage from './pages/ChildDashboard/ChildTestPassingPage';
+import ChildColoringPage from './pages/ChildDashboard/ChildColoringPage';
 
 function App() {
   return (
@@ -50,7 +52,8 @@ function App() {
               <Route path="stats" element={<ChildStatsPage />} />
               <Route path="events" element={<ChildEventsPage />} />
               <Route path="memo" element={<div>Памятка (в разработке)</div>} />
-              <Route path="test/:testId" element={<div>Прохождение теста (в разработке)</div>} />
+              <Route path="test/:testId" element={<ChildTestPassingPage />} />
+              <Route path="coloring/:testId" element={<ChildColoringPage />} />
             </Route>
           </Route>
         </Routes>
