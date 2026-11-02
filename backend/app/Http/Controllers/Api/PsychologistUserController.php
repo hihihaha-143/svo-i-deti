@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Child;
 use App\Models\Conversation;
+use App\Models\ConversationUserRead;
 use App\Models\Mentor;
+use App\Models\Message;
 use App\Models\ParentModel;
+use App\Models\UrgentNotification;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -210,20 +213,57 @@ class PsychologistUserController extends Controller
         ]);
     }
 
-    public function destroy(Request $request, $id)
-    {
-        $psychologist = $request->user()->psychologist;
-        $role = $request->input('role');
+   public function destroy(Request $request, $id)
+{
+    $psychologist = $request->user()->psychologist;
+    $role = $request->input('role');
 
-        $profile = match($role) {
-            'mentor' => Mentor::where('psychologist_id', $psychologist->id)->findOrFail($id),
-            'parent' => ParentModel::where('psychologist_id', $psychologist->id)->findOrFail($id),
-            'child' => Child::where('psychologist_id', $psychologist->id)->findOrFail($id),
-        };
+    $profile = match($role) {
+        'mentor' => Mentor::where('psychologist_id', $psychologist->id)->findOrFail($id),
+        'parent' => ParentModel::where('psychologist_id', $psychologist->id)->findOrFail($id),
+        'child' => Child::where('psychologist_id', $psychologist->id)->findOrFail($id),
+    };
 
-        $profile->user->delete();
-        return response()->json(['message' => 'Пользователь удален']);
+    $user = $profile->user;
+
+    // 1. Отвязываем детей от удаляемого профиля
+    if ($role === 'parent') {
+        \App\Models\Child::where('parent_id', $profile->id)->update(['parent_id' => null]);
     }
+    if ($role === 'mentor') {
+        \App\Models\Child::where('mentor_id', $profile->id)->update(['mentor_id' => null]);
+    }
+    if ($role === 'psychologist') {
+        \App\Models\Child::where('psychologist_id', $profile->id)->update(['psychologist_id' => null]);
+        \App\Models\Mentor::where('psychologist_id', $profile->id)->update(['psychologist_id' => null]);
+        \App\Models\ParentModel::where('psychologist_id', $profile->id)->update(['psychologist_id' => null]);
+    }
+
+    // 2. Удаляем сообщения пользователя
+    Message::where('sender_id', $user->id)->delete();
+
+    // 3. Удаляем чаты, где пользователь участник
+    Conversation::where('participant_one_id', $user->id)
+        ->orWhere('participant_two_id', $user->id)
+        ->delete();
+
+    // 4. Удаляем прочтения
+    ConversationUserRead::where('user_id', $user->id)->delete();
+
+    // 5. Удаляем срочные уведомления
+    UrgentNotification::where('child_id', $user->id)
+        ->orWhere('psychologist_id', $user->id)
+        ->delete();
+
+    // 6. Удаляем профиль
+    $profile->delete();
+
+    // 7. Удаляем токены и самого пользователя
+    $user->tokens()->delete();
+    $user->delete();
+
+    return response()->json(['message' => 'Пользователь удален']);
+}
 
     /**
      * Создаёт чат между двумя пользователями, если его ещё нет.
