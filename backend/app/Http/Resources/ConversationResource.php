@@ -9,8 +9,10 @@ class ConversationResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $userId = $request->user()->id;
-        $interlocutor = $this->interlocutorFor($userId);
+        $user = $request->user();
+        $userId = $user?->id;
+
+        $interlocutor = $userId ? $this->interlocutorFor($userId) : null;
 
         $read = $this->reads->firstWhere('user_id', $userId);
         $lastReadAt = $read?->last_read_at;

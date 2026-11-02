@@ -1,5 +1,6 @@
 import { FC } from 'react';
-import ChatListItem, { ChatListItemData } from './ChatListItem';
+import ChatListItem from './ChatListItem';
+import type { ChatListItemData } from './ChatListItem';
 
 interface ChatListProps {
   chats: ChatListItemData[];

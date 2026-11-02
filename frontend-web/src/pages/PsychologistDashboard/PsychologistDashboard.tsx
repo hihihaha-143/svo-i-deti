@@ -18,6 +18,8 @@ import RecommendationsPage from '../RecommendationsPage/RecommendationsPage';
 import TestsPage from './TestsPage';
 import TestResultsPage from '../TestResultsPage/TestResultsPage';
 import ReportsPage from '../ReportsPage/ReportsPage';
+import PsychologistChatPage from './PsychologistChatPage';
+import UrgentBadge from '../../components/chat/UrgentBadge';
 import { useAuth } from '../../contexts/AuthContext';
 import apiClient from '../../api/client';
 
@@ -33,11 +35,11 @@ interface DashboardData {
     online_mentors: number;
 }
 
-type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries' | 'events' | 'event-attendance' | 'chat-templates' | 'parent-materials' | 'daily-tips' | 'recommendations' | 'tests' | 'test-results' | 'reports';
+type PageKey = 'dashboard' | 'users' | 'login-logs' | 'moods' | 'diaries' | 'events' | 'event-attendance' | 'chat-templates' | 'parent-materials' | 'daily-tips' | 'recommendations' | 'tests' | 'test-results' | 'reports' | 'chat';
 
 const STORAGE_KEY = 'psychologist_current_page';
 const VALID_PAGES: PageKey[] = [
-    'dashboard', 'users', 'login-logs', 'moods', 'diaries', 'events', 'event-attendance', 'chat-templates', 'parent-materials', 'daily-tips', 'recommendations', 'tests', 'test-results', 'reports',
+    'dashboard', 'users', 'login-logs', 'moods', 'diaries', 'events', 'event-attendance', 'chat-templates', 'parent-materials', 'daily-tips', 'recommendations', 'tests', 'test-results', 'reports', 'chat',
 ];
 
 function isValidPage(value: string | null): value is PageKey {
@@ -148,6 +150,7 @@ export default function PsychologistDashboard() {
         'tests': 'Список тестов',
         'test-results': 'Результаты тестов',
         'reports': 'Отчётность',
+        'chat': 'Чат',
     };
 
     const renderPage = () => {
@@ -200,6 +203,7 @@ export default function PsychologistDashboard() {
         if (currentPage === 'tests') return <TestsPage />;
         if (currentPage === 'test-results') return <TestResultsPage />;
         if (currentPage === 'reports') return <ReportsPage />;
+        if (currentPage === 'chat') return <PsychologistChatPage />;
 
         return null;
     };
@@ -211,7 +215,7 @@ export default function PsychologistDashboard() {
             )}
 
             <div className={`dashboard-layout__sidebar-wrapper ${isSidebarOpen ? 'dashboard-layout__sidebar-wrapper--open' : ''}`}>
-                <Sidebar onClose={closeSidebar} onNavigate={(page) => setCurrentPage(page)} currentPage={currentPage} />
+                <Sidebar onClose={closeSidebar} onNavigate={(page) => setCurrentPage(page as PageKey)} currentPage={currentPage} />
             </div>
 
             <main className="dashboard-content">
@@ -222,10 +226,11 @@ export default function PsychologistDashboard() {
                     <h1>{pageTitles[currentPage]}</h1>
                     <div className="dashboard-content__user">
                         {user?.name}
+                        <UrgentBadge onClick={() => setCurrentPage('chat')} />
                     </div>
                 </header>
 
-                <div className="dashboard-content__body">
+                <div className={`dashboard-content__body ${currentPage === 'chat' ? 'dashboard-content__body--chat' : ''}`}>
                     {renderPage()}
                 </div>
             </main>

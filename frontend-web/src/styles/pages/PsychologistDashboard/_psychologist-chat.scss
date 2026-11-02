@@ -1,0 +1,84 @@
+.psychologist-chat {
+    --bg: #f4f6f9;
+    --text-par: var(--text-admin);
+    --primary-par: var(--primary-admin);
+    --secondary-par: var(--secondary-admin);
+
+    display: flex;
+    height: 100%;
+    min-height: 0;
+    background-color: var(--bg);
+    position: relative; /* Для кнопки назад */
+
+    &__sidebar {
+        width: 32rem;
+        flex-shrink: 0;
+        border-right: 1px solid #e0e0e0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        height: 100%;
+        background-color: #ffffff;
+    }
+
+    &__window {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        min-width: 0;
+        height: 100%;
+        background-color: #ffffff;
+        position: relative;
+    }
+
+    &__error {
+        padding: var(--space-2);
+        color: var(--wrong);
+        font-size: 1.3rem;
+        text-align: center;
+    }
+
+    /* Скрываем кнопку назад на десктопе */
+    &__back {
+        display: none; 
+    }
+
+    /* --- МОБИЛЬНАЯ ВЕРСИЯ --- */
+    @media (max-width: 768px) {
+        &__sidebar {
+            width: 100%;
+            display: flex; /* Список виден, если чат не выбран */
+        }
+
+        &__window {
+            display: none; /* Окно скрыто, если чат не выбран */
+        }
+
+        /* Если чат выбран (класс --has-active) */
+        &--has-active {
+            .psychologist-chat__sidebar {
+                display: none; /* Прячем список */
+            }
+
+            .psychologist-chat__window {
+                display: flex; /* Показываем окно */
+            }
+
+            .psychologist-chat__back {
+                display: flex; /* Показываем кнопку Назад */
+                align-items: center;
+                gap: 0.5rem;
+                padding: 1rem;
+                background: none;
+                border: none;
+                color: var(--primary-admin);
+                font-size: 1.4rem;
+                font-weight: 600;
+                cursor: pointer;
+                border-bottom: 1px solid #e0e0e0;
+                background-color: #ffffff;
+            }
+        }
+    }
+}

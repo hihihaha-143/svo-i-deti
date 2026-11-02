@@ -24,11 +24,10 @@ const MessageList: FC<MessageListProps> = ({
   shouldScrollToBottom = true,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (shouldScrollToBottom && bottomRef.current) {
-      bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (shouldScrollToBottom && containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
   }, [messages.length, shouldScrollToBottom]);
 
@@ -70,8 +69,6 @@ const MessageList: FC<MessageListProps> = ({
           />
         ))}
       </div>
-
-      <div ref={bottomRef} />
     </div>
   );
 };

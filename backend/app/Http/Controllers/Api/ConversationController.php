@@ -22,33 +22,55 @@ use Illuminate\Support\Facades\Gate;
 
 class ConversationController extends Controller
 {
-    public function index(Request $request)
-    {
-        $user = $request->user();
+   public function index(Request $request)
+{
+    $user = $request->user();
 
-        $conversations = Conversation::query()
-            ->where(function ($q) use ($user) {
-                $q->where('participant_one_id', $user->id)
-                  ->orWhere('participant_two_id', $user->id);
-            })
-            ->with(['participantOne', 'participantTwo', 'reads'])
-            ->get();
+    $conversations = Conversation::query()
+        ->where(function ($q) use ($user) {
+            $q->where('participant_one_id', $user->id)
+              ->orWhere('participant_two_id', $user->id);
+        })
+        ->with(['participantOne', 'participantTwo', 'reads'])
+        ->orderByDesc('last_message_at')
+        ->get();
 
-        $conversations = $conversations->filter(
-            fn (Conversation $c) => Gate::allows('view', $c)
-        )->values();
+    $data = $conversations->map(function (Conversation $c) use ($user) {
+        $interlocutor = $c->participant_one_id === $user->id
+            ? $c->participantTwo
+            : $c->participantOne;
 
-        $sorted = $conversations->sort(function (Conversation $a, Conversation $b) {
-            $urgentA = $a->messages()->where('is_urgent', true)->exists() ? 1 : 0;
-            $urgentB = $b->messages()->where('is_urgent', true)->exists() ? 1 : 0;
-            if ($urgentA !== $urgentB) {
-                return $urgentB <=> $urgentA;
-            }
-            return ($b->last_message_at?->timestamp ?? 0) <=> ($a->last_message_at?->timestamp ?? 0);
-        })->values();
+        $read = $c->reads->firstWhere('user_id', $user->id);
+        $lastReadAt = $read?->last_read_at;
 
-        return ConversationResource::collection($sorted);
-    }
+        $unreadCount = \App\Models\Message::where('conversation_id', $c->id)
+            ->where('sender_id', '!=', $user->id)
+            ->when($lastReadAt, fn ($q) => $q->where('created_at', '>', $lastReadAt))
+            ->count();
+
+        $hasUrgent = \App\Models\Message::where('conversation_id', $c->id)
+            ->where('is_urgent', true)
+            ->when($lastReadAt, fn ($q) => $q->where('created_at', '>', $lastReadAt))
+            ->exists();
+
+        return [
+            'id' => $c->id,
+            'type' => $c->type,
+            'interlocutor' => $interlocutor ? [
+                'id' => $interlocutor->id,
+                'name' => $interlocutor->name,
+                'role' => $interlocutor->role,
+            ] : null,
+            'last_message_preview' => $c->last_message_preview,
+            'last_message_at' => $c->last_message_at?->toIso8601String(),
+            'unread_count' => $unreadCount,
+            'has_urgent' => $hasUrgent,
+            'is_archived' => (bool) $c->is_archived,
+        ];
+    });
+
+    return response()->json(['data' => $data]);
+}
 
     public function store(StoreConversationRequest $request)
     {
@@ -78,7 +100,7 @@ class ConversationController extends Controller
             ]
         );
 
-        if (! Gate::allows('view', $conversation)) {
+        if (! Gate::forUser($user)->allows('view', $conversation)) {
             return response()->json(['message' => 'Недопустимый диалог'], 403);
         }
 
@@ -89,7 +111,7 @@ class ConversationController extends Controller
 
     public function messages(Request $request, Conversation $conversation)
     {
-        Gate::authorize('view', $conversation);
+        Gate::forUser($request->user())->authorize('view', $conversation);
 
         $limit = (int) $request->query('limit', 50);
         $limit = max(1, min($limit, 100));
@@ -113,13 +135,13 @@ class ConversationController extends Controller
         Conversation $conversation,
         ModerationService $moderation
     ) {
-        Gate::authorize('sendMessage', $conversation);
+        Gate::forUser($request->user())->authorize('sendMessage', $conversation);
 
         $user = $request->user();
         $body = $request->input('body');
         $isUrgent = (bool) $request->input('is_urgent', false);
 
-        if ($isUrgent && ! Gate::allows('sendUrgent', $conversation)) {
+        if ($isUrgent && ! Gate::forUser($user)->allows('sendUrgent', $conversation)) {
             return response()->json(['message' => 'Срочные сообщения недоступны'], 403);
         }
 
@@ -171,7 +193,7 @@ class ConversationController extends Controller
 
     public function markRead(MarkReadRequest $request, Conversation $conversation)
     {
-        Gate::authorize('markRead', $conversation);
+        Gate::forUser($request->user())->authorize('markRead', $conversation);
 
         $user = $request->user();
         $lastMessageId = (int) $request->input('last_message_id');
