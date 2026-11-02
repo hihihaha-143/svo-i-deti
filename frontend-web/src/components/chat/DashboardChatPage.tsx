@@ -1,12 +1,14 @@
-import { FC, useEffect, useState, useCallback, useRef } from 'react';
+import { FC, useEffect, useState, useCallback } from 'react';
 import { ChevronLeft } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import apiClient from '../../api/client';
 import ChatList from './ChatList';
 import type { ChatListItemData } from './ChatListItem';
 import ChatWindow from './ChatWindow';
+import { useChatChannel } from '../../hooks/useChatChannel';
 import { echo } from '../../lib/echo';
 import type { MessageBubbleMessage } from './MessageBubble';
+
 
 interface MessagesResponse {
   data: MessageBubbleMessage[];
@@ -32,8 +34,6 @@ const DashboardChatPage: FC<DashboardChatPageProps> = ({ role }) => {
   const activeChat = chats.find((c) => c.id === activeChatId) ?? null;
   const interlocutor = activeChat?.interlocutor ?? null;
 
-  const channelRef = useRef<any>(null);
-
   const isPsychologist = role === 'psychologist';
   const showFlag = isPsychologist;
   const showUrgent = isPsychologist;
@@ -55,6 +55,7 @@ const DashboardChatPage: FC<DashboardChatPageProps> = ({ role }) => {
     loadChats();
   }, [loadChats]);
 
+  // Подписка на срочные уведомления (только психолог)
   useEffect(() => {
     if (!user || !isPsychologist) return;
     const channel = echo.private(`user.${user.id}`);
@@ -98,11 +99,6 @@ const DashboardChatPage: FC<DashboardChatPageProps> = ({ role }) => {
       setMessages([]);
       setError(null);
 
-      if (channelRef.current) {
-        echo.leave(channelRef.current);
-        channelRef.current = null;
-      }
-
       await loadMessages(chatId);
 
       if (messages.length > 0) {
@@ -110,30 +106,28 @@ const DashboardChatPage: FC<DashboardChatPageProps> = ({ role }) => {
           last_message_id: messages[messages.length - 1].id,
         }).catch(() => {});
       }
-
-      const channel = echo.private(`conversation.${chatId}`);
-      channel.listen('.MessageSent', (payload: { message: MessageBubbleMessage }) => {
-        const incoming = payload.message;
-        if (incoming.sender_id === currentUserId) return;
-        setMessages((prev) => {
-          if (prev.some((m) => m.id === incoming.id)) return prev;
-          return [...prev, incoming];
-        });
-        setShouldScrollToBottom(true);
-        loadChats();
-      });
-      channelRef.current = channel;
     },
-    [activeChatId, currentUserId, loadChats, loadMessages, messages],
+    [activeChatId, loadMessages, messages],
   );
 
-  useEffect(() => {
-    return () => {
-      if (channelRef.current) {
-        echo.leave(channelRef.current);
+  // Реалтайм для активного чата
+  useChatChannel({
+    conversationId: activeChatId,
+    currentUserId,
+    onMessage: useCallback((incoming: MessageBubbleMessage) => {
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === incoming.id)) return prev;
+        return [...prev, incoming];
+      });
+      setShouldScrollToBottom(true);
+      loadChats();
+      if (activeChatId) {
+        apiClient.post(`/conversations/${activeChatId}/read`, {
+          last_message_id: incoming.id,
+        }).catch(() => {});
       }
-    };
-  }, []);
+    }, [activeChatId, loadChats]),
+  });
 
   const handleLoadMore = async () => {
     if (!activeChatId || messages.length === 0) return;

@@ -10,6 +10,7 @@ import ParentDiaryPage from './pages/ParentDashboard/ParentDiaryPage';
 import ParentLibraryPage from './pages/ParentDashboard/ParentLibraryPage';
 import ParentLibraryArticlePage from './pages/ParentDashboard/ParentLibraryArticlePage';
 import ParentTestPassingPage from './pages/ParentDashboard/ParentTestPassingPage';
+import ParentChatPage from './pages/ParentDashboard/ParentChatPage';
 import ChildDashboard from './pages/ChildDashboard/ChildDashboard';
 import ChildHomePage from './pages/ChildDashboard/ChildHomePage';
 import ChildAchievementsPage from './pages/ChildDashboard/ChildAchievementsPage';
@@ -42,7 +43,7 @@ function App() {
               <Route path="library" element={<ParentLibraryPage />} />
               <Route path="library/:id" element={<ParentLibraryArticlePage />} />
               <Route path="test/:testId" element={<ParentTestPassingPage />} />
-              <Route path="chat" element={<div>Чат с психологом (в разработке)</div>} />
+              <Route path="chat" element={<ParentChatPage />} />
             </Route>
           </Route>
 

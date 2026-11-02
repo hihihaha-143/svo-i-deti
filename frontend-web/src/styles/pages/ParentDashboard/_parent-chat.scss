@@ -1,0 +1,44 @@
+.parent-chat {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    background-color: var(--bg-par);
+
+    &__back {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: var(--space-1) var(--space-2);
+        background: none;
+        border: none;
+        border-bottom: 1px solid var(--secondary-par);
+        color: var(--primary-par);
+        font-size: 1.4rem;
+        font-weight: 600;
+        cursor: pointer;
+        flex-shrink: 0;
+        background-color: var(--bg-par);
+
+        &:hover {
+            background-color: rgba(144, 109, 69, 0.05);
+        }
+    }
+
+    &__loading,
+    &__error {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        padding: var(--space-2);
+        font-size: 1.4rem;
+        color: var(--text-par);
+        opacity: 0.7;
+    }
+
+    &__error {
+        color: var(--wrong);
+        opacity: 1;
+    }
+}
