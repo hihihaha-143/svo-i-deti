@@ -9,6 +9,7 @@ import MentorMoodPage from './MentorMoodPage';
 import MentorEventPage from './MentorEventPage';
 import MentorEventAttendancePage from './MentorEventAttendancePage';
 import MentorTestResultsPage from './MentorTestResultsPage';
+import DashboardChatPage from '../../components/chat/DashboardChatPage';
 import { useAuth } from '../../contexts/AuthContext';
 import apiClient from '../../api/client';
 
@@ -183,7 +184,7 @@ export default function MentorDashboard() {
         }
 
         if (currentPage === 'chat') {
-            return <PageStub title="Чат" />;
+            return <DashboardChatPage role="mentor" />;
         }
 
         if (currentPage === 'child-answers') {
@@ -218,7 +219,7 @@ export default function MentorDashboard() {
                     </div>
                 </header>
 
-                <div className="dashboard-content__body">
+                <div className={`dashboard-content__body ${currentPage === 'chat' ? 'dashboard-content__body--chat' : ''}`}>
                     {renderPage()}
                 </div>
             </main>

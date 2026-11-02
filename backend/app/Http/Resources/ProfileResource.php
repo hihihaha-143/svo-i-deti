@@ -57,8 +57,8 @@ class ProfileResource extends JsonResource
 
         return [
             'external_id' => $mentor->psychologist_id.'.'.$mentor->id.'.'.$p->id,
-            'psychologist_id' => $p->psychologist_id,
-            'mentor_id' => $p->mentor_id,
+            'psychologist_id' => $psychologist?->user_id,
+            'mentor_id' => $mentor?->user_id,
             'psychologist_name' => $psychologist?->user?->name,
             'mentor_name' => $mentor?->user?->name,
         ];
@@ -78,8 +78,8 @@ class ProfileResource extends JsonResource
 
         return [
             'external_id' => $mentor->psychologist_id.'.'.$mentor->id.'.'.$parent->id.'.'.$c->id,
-           'psychologist_id' => $c->psychologist?->user_id, 
-            'mentor_id' => $c->mentor_id,
+            'psychologist_id' => $psychologist?->user_id,
+            'mentor_id' => $mentor?->user_id,
             'parent_id' => $c->parent_id,
             'psychologist_name' => $psychologist?->user?->name,
             'mentor_name' => $mentor?->user?->name,

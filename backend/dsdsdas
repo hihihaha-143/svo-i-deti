@@ -1,0 +1,64 @@
+[90m= [39m[34;4mIlluminate\Database\Eloquent\Collection[39;24m {#9039
+    [34mall[39m: [
+      [34;4mApp\Models\User[39;24m {#9041
+        [34mid[39m: [35m1[39m,
+        [34mname[39m: [32m"[39m[32mПсихолог[39m[32m"[39m,
+        [34mlogin[39m: [32m"[39m[32mpsychologist[39m[32m"[39m,
+        [34mrole[39m: [32m"[39m[32mpsychologist[39m[32m"[39m,
+      },
+      [34;4mApp\Models\User[39;24m {#8579
+        [34mid[39m: [35m2[39m,
+        [34mname[39m: [32m"[39m[32mПсихолог[39m[32m"[39m,
+        [34mlogin[39m: [32m"[39m[32madmin[39m[32m"[39m,
+        [34mrole[39m: [32m"[39m[32mpsychologist[39m[32m"[39m,
+      },
+      [34;4mApp\Models\User[39;24m {#8345
+        [34mid[39m: [35m3[39m,
+        [34mname[39m: [32m"[39m[32mТест Наставник[39m[32m"[39m,
+        [34mlogin[39m: [32m"[39m[32mmentor_test[39m[32m"[39m,
+        [34mrole[39m: [32m"[39m[32mmentor[39m[32m"[39m,
+      },
+      [34;4mApp\Models\User[39;24m {#8340
+        [34mid[39m: [35m4[39m,
+        [34mname[39m: [32m"[39m[32mТест Родитель[39m[32m"[39m,
+        [34mlogin[39m: [32m"[39m[32mparent_test[39m[32m"[39m,
+        [34mrole[39m: [32m"[39m[32mparent[39m[32m"[39m,
+      },
+      [34;4mApp\Models\User[39;24m {#8578
+        [34mid[39m: [35m5[39m,
+        [34mname[39m: [32m"[39m[32mРебенок 1[39m[32m"[39m,
+        [34mlogin[39m: [32m"[39m[32mchild1_test[39m[32m"[39m,
+        [34mrole[39m: [32m"[39m[32mchild[39m[32m"[39m,
+      },
+      [34;4mApp\Models\User[39;24m {#8565
+        [34mid[39m: [35m6[39m,
+        [34mname[39m: [32m"[39m[32mРебенок 2[39m[32m"[39m,
+        [34mlogin[39m: [32m"[39m[32mchild2_test[39m[32m"[39m,
+        [34mrole[39m: [32m"[39m[32mchild[39m[32m"[39m,
+      },
+      [34;4mApp\Models\User[39;24m {#8609
+        [34mid[39m: [35m7[39m,
+        [34mname[39m: [32m"[39m[32mПсихолог Демо[39m[32m"[39m,
+        [34mlogin[39m: [32m"[39m[32mpsychologist_demo[39m[32m"[39m,
+        [34mrole[39m: [32m"[39m[32mpsychologist[39m[32m"[39m,
+      },
+      [34;4mApp\Models\User[39;24m {#8605
+        [34mid[39m: [35m8[39m,
+        [34mname[39m: [32m"[39m[32mРебёнок Демо[39m[32m"[39m,
+        [34mlogin[39m: [32m"[39m[32mchild_demo[39m[32m"[39m,
+        [34mrole[39m: [32m"[39m[32mchild[39m[32m"[39m,
+      },
+      [34;4mApp\Models\User[39;24m {#9013
+        [34mid[39m: [35m9[39m,
+        [34mname[39m: [32m"[39m[32mВторой Ребёнок[39m[32m"[39m,
+        [34mlogin[39m: [32m"[39m[32mchild_demo_2[39m[32m"[39m,
+        [34mrole[39m: [32m"[39m[32mchild[39m[32m"[39m,
+      },
+      [34;4mApp\Models\User[39;24m {#9014
+        [34mid[39m: [35m10[39m,
+        [34mname[39m: [32m"[39m[32mвввв[39m[32m"[39m,
+        [34mlogin[39m: [32m"[39m[32mвввв[39m[32m"[39m,
+        [34mrole[39m: [32m"[39m[32mchild[39m[32m"[39m,
+      },
+    ],
+  }

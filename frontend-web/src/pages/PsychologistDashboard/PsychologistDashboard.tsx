@@ -18,7 +18,7 @@ import RecommendationsPage from '../RecommendationsPage/RecommendationsPage';
 import TestsPage from './TestsPage';
 import TestResultsPage from '../TestResultsPage/TestResultsPage';
 import ReportsPage from '../ReportsPage/ReportsPage';
-import PsychologistChatPage from './PsychologistChatPage';
+import DashboardChatPage from '../../components/chat/DashboardChatPage';
 import UrgentBadge from '../../components/chat/UrgentBadge';
 import { useAuth } from '../../contexts/AuthContext';
 import apiClient from '../../api/client';
@@ -203,7 +203,7 @@ export default function PsychologistDashboard() {
         if (currentPage === 'tests') return <TestsPage />;
         if (currentPage === 'test-results') return <TestResultsPage />;
         if (currentPage === 'reports') return <ReportsPage />;
-        if (currentPage === 'chat') return <PsychologistChatPage />;
+        if (currentPage === 'chat') return <DashboardChatPage role="psychologist" />;
 
         return null;
     };

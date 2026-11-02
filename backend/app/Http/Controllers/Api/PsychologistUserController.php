@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Child;
+use App\Models\Conversation;
 use App\Models\Mentor;
 use App\Models\ParentModel;
 use App\Models\User;
@@ -110,6 +111,13 @@ class PsychologistUserController extends Controller
                 'psychologist_id' => $psychologist->id,
                 'mentor_id' => $mentor->id,
             ]);
+            // Создаём чат родитель ↔ психолог
+            $this->ensureConversation(
+                'parent_psychologist',
+                $request->user()->id,
+                $user->id,
+                null
+            );
         } elseif ($role === 'child') {
             Child::create([
                 'user_id' => $user->id,
@@ -117,6 +125,25 @@ class PsychologistUserController extends Controller
                 'mentor_id' => $validated['mentor_id'],
                 'parent_id' => $validated['parent_id'],
             ]);
+
+            // Создаём чат ребёнок ↔ психолог
+            $this->ensureConversation(
+                'child_psychologist',
+                $request->user()->id,
+                $user->id,
+                $user->id
+            );
+
+            // Создаём чат ребёнок ↔ наставник
+            $mentorUser = Mentor::find($validated['mentor_id'])?->user;
+            if ($mentorUser) {
+                $this->ensureConversation(
+                    'child_mentor',
+                    $mentorUser->id,
+                    $user->id,
+                    $user->id
+                );
+            }
         }
 
         return response()->json(['message' => 'Пользователь создан'], 201);
@@ -196,6 +223,31 @@ class PsychologistUserController extends Controller
 
         $profile->user->delete();
         return response()->json(['message' => 'Пользователь удален']);
+    }
+
+    /**
+     * Создаёт чат между двумя пользователями, если его ещё нет.
+     */
+    private function ensureConversation(string $type, int $participantA, int $participantB, ?int $childId): void
+    {
+        $one = min($participantA, $participantB);
+        $two = max($participantA, $participantB);
+
+        $existing = Conversation::where('type', $type)
+            ->where('participant_one_id', $one)
+            ->where('participant_two_id', $two)
+            ->first();
+
+        if ($existing) {
+            return;
+        }
+
+        Conversation::create([
+            'type' => $type,
+            'participant_one_id' => $one,
+            'participant_two_id' => $two,
+            'child_id' => $childId,
+        ]);
     }
 
     /**
